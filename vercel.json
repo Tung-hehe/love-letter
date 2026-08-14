@@ -1,0 +1,23 @@
+{
+  "framework": null,
+  "rewrites": [
+    { "source": "/", "destination": "/app/index.html" },
+    { "source": "/edit/:id", "destination": "/app/index.html" },
+    { "source": "/edit/:id/style", "destination": "/app/index.html" },
+    { "source": "/edit/:id/preview", "destination": "/app/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/app/sw.js",
+      "headers": [
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    }
+  ]
+}

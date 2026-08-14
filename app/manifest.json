@@ -1,0 +1,16 @@
+{
+  "name": "Love letter",
+  "short_name": "Love letter",
+  "description": "Soạn thư tình",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF2F0",
+  "theme_color": "#9C4763",
+  "lang": "vi",
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

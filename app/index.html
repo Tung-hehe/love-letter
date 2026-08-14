@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<script>
+  try {
+    var savedTheme = localStorage.getItem('thu-tay-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (e) {}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<meta name="theme-color" content="#9C4763">
+<meta name="color-scheme" content="light dark">
+<title>Love letter</title>
+<link rel="manifest" href="/app/manifest.json">
+<link rel="icon" href="/app/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/app/icons/icon.svg">
+<style>
+  :root{
+    --paper: #FBF2F0;
+    --paper-raised: #FFFCFB;
+    --ink: #4A323D;
+    --ink-soft: #8A6B76;
+    --ink-faint: #BB9DA6;
+    --accent: #B15873;
+    --accent-fill: #9C4763;
+    --accent-soft: #E3AEBB;
+    --accent-bg: #F7E3E8;
+    --gold: #B8925A;
+    --gold-bg: #F6E9D3;
+    --border: rgba(74,42,58,0.14);
+    --border-strong: rgba(74,42,58,0.26);
+    --shadow: rgba(74,42,58,0.16);
+    --danger: #B23A3A;
+    --danger-bg: #F7E4E2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper: #1F171C;
+      --paper-raised: #2B1F26;
+      --ink: #F5E9ED;
+      --ink-soft: #CBB0BA;
+      --ink-faint: #8F7680;
+      --accent: #E8A9BA;
+      --accent-fill: #C97690;
+      --accent-soft: #7A4655;
+      --accent-bg: rgba(232,169,186,0.16);
+      --gold: #E0C08A;
+      --gold-bg: rgba(224,192,138,0.16);
+      --border: rgba(245,233,237,0.15);
+      --border-strong: rgba(245,233,237,0.26);
+      --shadow: rgba(0,0,0,0.5);
+      --danger: #E38585;
+      --danger-bg: rgba(227,133,133,0.14);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #1F171C; --paper-raised: #2B1F26; --ink: #F5E9ED; --ink-soft: #CBB0BA;
+    --ink-faint: #8F7680; --accent: #E8A9BA; --accent-fill: #C97690; --accent-soft: #7A4655;
+    --accent-bg: rgba(232,169,186,0.16); --gold: #E0C08A; --gold-bg: rgba(224,192,138,0.16);
+    --border: rgba(245,233,237,0.15); --border-strong: rgba(245,233,237,0.26); --shadow: rgba(0,0,0,0.5);
+    --danger: #E38585; --danger-bg: rgba(227,133,133,0.14);
+  }
+  :root[data-theme="light"]{
+    --paper: #FBF2F0; --paper-raised: #FFFCFB; --ink: #4A323D; --ink-soft: #8A6B76;
+    --ink-faint: #BB9DA6; --accent: #B15873; --accent-fill: #9C4763; --accent-soft: #E3AEBB;
+    --accent-bg: #F7E3E8; --gold: #B8925A; --gold-bg: #F6E9D3;
+    --border: rgba(74,42,58,0.14); --border-strong: rgba(74,42,58,0.26); --shadow: rgba(74,42,58,0.16);
+    --danger: #B23A3A; --danger-bg: #F7E4E2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+
+  .screen{display:none;min-height:100vh;flex-direction:column;background:var(--paper);}
+  .screen.active{display:flex;animation:screen-in 0.28s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes screen-in{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .screen.active{animation:none;}
+  }
+  .primary-btn, .secondary-btn, .new-letter-btn, .letter-card-open, .theme-card, .icon-btn{
+    transition:transform 0.12s ease;
+  }
+  .primary-btn:active, .secondary-btn:active, .new-letter-btn:active, .letter-card-open:active,
+  .theme-card:active, .icon-btn:active{
+    transform:scale(0.96);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .primary-btn, .secondary-btn, .new-letter-btn, .letter-card-open, .theme-card, .icon-btn{ transition:none; }
+    .primary-btn:active, .secondary-btn:active, .new-letter-btn:active, .letter-card-open:active,
+    .theme-card:active, .icon-btn:active{ transform:none; }
+  }
+
+  .topbar{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 16px calc(10px + env(safe-area-inset-top));
+    border-bottom:0.5px solid var(--border);
+    position:sticky;top:0;background:var(--paper);z-index:5;
+  }
+  .topbar h2{
+    font-family:Georgia,'Noto Serif',serif;
+    font-style:italic;font-weight:600;font-size:18px;margin:0;color:var(--ink);flex:1;
+  }
+  .icon-btn{
+    width:34px;height:34px;border-radius:50%;border:0.5px solid var(--border);
+    background:var(--paper-raised);color:var(--ink-soft);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn svg{width:16px;height:16px;}
+
+  .screen-body{max-width:520px;margin:0 auto;width:100%;padding:16px 18px 24px;flex:1;}
+  h1{
+    font-family:Georgia,'Noto Serif',serif;
+    font-style:italic;font-weight:600;font-size:30px;margin:0 0 4px;color:var(--ink);
+  }
+  .subtitle{font-size:14px;color:var(--ink-soft);margin:0 0 16px;line-height:1.55;}
+
+  /* --- Màn Thư viện --- */
+  #screen-home .app-header{padding:22px 18px 16px;max-width:520px;margin:0 auto;width:100%;}
+  .app-header-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .app-header-row h1{margin:0;}
+  #theme-toggle svg{width:16px;height:16px;}
+  .letter-list{display:flex;flex-direction:column;gap:10px;}
+  .letter-card{
+    display:flex;align-items:center;gap:2px;width:100%;
+    padding:5px 6px 5px 12px;background:var(--paper-raised);
+    border:0.5px solid var(--border);border-radius:14px;
+  }
+  .letter-card-open{
+    display:flex;align-items:center;gap:12px;flex:1;min-width:0;
+    text-align:left;background:none;border:none;padding:6px 0;font-family:inherit;color:inherit;
+  }
+  .lc-icon{
+    width:38px;height:38px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 8px var(--shadow);
+  }
+  .lc-icon svg{width:15px;height:15px;fill:#fff;opacity:0.92;}
+  .lc-text{min-width:0;}
+  .lc-title{font-size:14px;font-weight:500;margin:0 0 2px;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lc-meta{font-size:11.5px;color:var(--ink-faint);margin:0;}
+  .lc-chev{margin-left:auto;color:var(--ink-faint);flex-shrink:0;}
+  .lc-chev svg{width:14px;height:14px;}
+  .letter-card-delete{
+    flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;
+    background:none;color:var(--ink-faint);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .letter-card-delete svg{width:16px;height:16px;}
+  .letter-card-delete:active{background:var(--danger-bg);color:var(--danger);}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--ink-soft);}
+  .empty-state p{margin:0 0 4px;font-size:14.5px;}
+  .empty-state .empty-hint{color:var(--ink-faint);font-size:13px;}
+  .new-letter-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;background:var(--accent-fill);color:#fff;border:none;
+    border-radius:12px;padding:13px;font-size:14.5px;font-weight:500;font-family:inherit;
+    box-shadow:0 8px 18px var(--shadow);margin-top:14px;
+  }
+  .new-letter-btn svg{width:16px;height:16px;}
+
+  /* --- Màn Phong cách thư --- */
+  .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .theme-card{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:10px;background:var(--paper-raised);
+    border:0.5px solid var(--border);border-radius:14px;font-family:inherit;color:inherit;
+  }
+  .theme-card.picked{border:1.5px solid var(--accent);background:var(--accent-bg);}
+  .t-swatch{
+    width:40px;height:40px;flex-shrink:0;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 8px var(--shadow);
+  }
+  .t-swatch svg{width:20px;height:20px;}
+  .t-name{font-size:13px;font-weight:500;margin:0;color:var(--ink);}
+  .t-mood{font-size:11px;color:var(--ink-faint);margin:1px 0 0;}
+
+  .primary-btn{
+    width:100%;background:var(--accent-fill);color:#fff;border:none;
+    border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit;
+    box-shadow:0 10px 22px var(--shadow);
+  }
+  .primary-btn:disabled{opacity:0.6;}
+  .secondary-btn{
+    width:100%;background:var(--paper-raised);color:var(--ink-soft);
+    border:0.5px solid var(--border-strong);border-radius:12px;padding:14px;
+    font-size:14.5px;font-weight:500;font-family:inherit;
+  }
+  /* --- Màn Soạn thư (dùng lại cho form) --- */
+  #letter-form{display:flex;flex-direction:column;gap:16px;}
+  .field label{
+    display:block;font-size:11px;font-weight:500;letter-spacing:0.04em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  input[type="text"], textarea{
+    width:100%;background:var(--paper-raised);border:0.5px solid var(--border);
+    border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:var(--ink);
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg);
+  }
+  textarea{resize:vertical;line-height:1.5;}
+  .hint{font-size:12px;color:var(--ink-faint);margin-top:5px;}
+
+  .field.has-error label{color:var(--danger);}
+  .field.has-error input[type="text"], .field.has-error textarea{
+    border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-bg);
+  }
+  .field-error-msg{font-size:12px;color:var(--danger);margin:6px 0 0;}
+
+  .para-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+  .para-input-wrap{flex:1;min-width:0;}
+  .para-count{font-size:11px;color:var(--ink-faint);margin:4px 2px 0;text-align:right;}
+  .para-count.warn{color:var(--gold);}
+  .para-remove{
+    flex-shrink:0;width:36px;height:36px;border-radius:10px;margin-top:1px;
+    border:0.5px solid var(--border);background:var(--paper-raised);
+    color:var(--ink-faint);display:flex;align-items:center;justify-content:center;
+  }
+  .para-remove svg{width:15px;height:15px;}
+  .para-break{display:flex;align-items:center;gap:8px;margin:2px 0 8px;}
+  .para-break-line{flex:1;height:0;border-top:1px dashed var(--border-strong);}
+  .para-break-toggle{
+    flex-shrink:0;font-size:11px;font-weight:500;color:var(--ink-faint);
+    background:var(--paper-raised);border:0.5px solid var(--border);border-radius:999px;
+    padding:5px 11px;font-family:inherit;
+  }
+  .para-break.is-active .para-break-line{border-top-color:var(--accent);}
+  .para-break.is-active .para-break-toggle{color:#fff;background:var(--accent);border-color:var(--accent);}
+  .add-para{
+    width:100%;font-size:13.5px;font-weight:500;color:var(--accent);
+    border:1px dashed var(--border-strong);background:transparent;
+    border-radius:11px;padding:11px;font-family:inherit;
+  }
+  .template-dot-btn{
+    width:26px;height:26px;border-radius:50%;border:none;padding:0;flex-shrink:0;
+    background:var(--paper-raised);box-shadow:inset 0 0 0 1px var(--border);
+  }
+  .dot-inner{display:block;width:100%;height:100%;border-radius:50%;}
+
+  /* --- Màn Xem thư --- */
+  #preview-frame{flex:1;width:100%;border:none;background:#fff;}
+  .bottom-bar{
+    display:flex;flex-direction:column;gap:8px;
+    padding:12px 16px calc(14px + env(safe-area-inset-bottom));
+    border-top:0.5px solid var(--border);background:var(--paper);
+  }
+  .bottom-bar-row{display:flex;gap:10px;}
+  .bottom-bar-row > *, #download-btn{flex:1;margin:0;box-shadow:none;}
+
+  @media (max-width:380px){
+    .row2{grid-template-columns:1fr;}
+  }
+
+  /* --- Màn trống bên phải khi chưa chọn thư/thao tác nào (chỉ hiện trên laptop) --- */
+  .detail-empty{align-items:center;justify-content:center;}
+  .detail-empty-inner{
+    max-width:280px;text-align:center;padding:24px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  .detail-empty-icon{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--accent-bg);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .detail-empty-icon svg{width:24px;height:24px;}
+  .detail-empty h2{
+    font-family:Georgia,'Noto Serif',serif;
+    font-style:italic;font-weight:600;font-size:19px;margin:0;color:var(--ink);
+  }
+  .detail-empty p{font-size:13.5px;color:var(--ink-soft);margin:0;line-height:1.6;}
+
+  /* --- Laptop/desktop: danh sách thư luôn hiện bên trái, nội dung thao tác bên phải --- */
+  @media (min-width:860px){
+    body{padding:0;}
+    .screen-stack{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      width:100%;max-width:1280px;height:100vh;
+      margin:0 auto;
+    }
+    #screen-home{
+      display:flex !important;
+      animation:none;
+      grid-column:1;
+      position:relative;
+      min-height:0;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      border-right:0.5px solid var(--border);
+    }
+    #screen-picker, #screen-compose, #screen-letter-preview, #screen-detail-empty{
+      grid-column:2;
+      min-height:0;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      background:var(--paper-raised);
+      animation:none;
+    }
+    #screen-detail-empty{display:none;}
+    .screen-stack:not(:has(#screen-picker.active)):not(:has(#screen-compose.active)):not(:has(#screen-letter-preview.active))
+      #screen-detail-empty{
+      display:flex;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="screen-stack">
+
+    <!-- Màn 1: Thư viện -->
+    <section id="screen-home" class="screen active">
+      <div class="app-header">
+        <div class="app-header-row">
+          <h1>Thư viện</h1>
+          <button type="button" id="theme-toggle" class="icon-btn" aria-label="Đổi giao diện sáng/tối"></button>
+        </div>
+        <button type="button" id="fab-new" class="new-letter-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Viết thư mới</span>
+        </button>
+      </div>
+      <div class="screen-body">
+        <p id="home-subtitle" class="subtitle"></p>
+        <div id="letter-list" class="letter-list"></div>
+        <div id="home-empty" class="empty-state" hidden>
+          <p>Chưa có lá thư nào.</p>
+          <p class="empty-hint">Viết lá thư đầu tiên của bạn.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Màn 2: Phong cách thư -->
+    <section id="screen-picker" class="screen">
+      <div class="topbar">
+        <button type="button" id="picker-back" class="icon-btn" aria-label="Quay lại">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <h2>Phong cách thư</h2>
+      </div>
+      <div class="screen-body">
+        <p class="subtitle">Mỗi phong cách một sắc thái riêng</p>
+        <div id="picker-grid" class="picker-grid"></div>
+      </div>
+    </section>
+
+    <!-- Màn 3: Soạn thư -->
+    <section id="screen-compose" class="screen">
+      <div class="topbar">
+        <button type="button" id="compose-back" class="icon-btn" aria-label="Quay lại">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <h2>Soạn thư</h2>
+        <button type="button" id="compose-template-dot" class="template-dot-btn" aria-label="Đổi phong cách">
+          <span class="dot-inner"></span>
+        </button>
+      </div>
+      <div class="screen-body">
+        <form id="letter-form">
+          <div class="field">
+            <label for="f-title">Tiêu đề</label>
+            <input type="text" id="f-title" name="title" placeholder="Gửi người thương">
+          </div>
+
+          <div class="field">
+            <label for="f-date">Ngày</label>
+            <input type="text" id="f-date" name="date" placeholder="20 tháng 7, 2026">
+          </div>
+
+          <div class="field">
+            <label for="f-greeting">Lời chào</label>
+            <input type="text" id="f-greeting" name="greeting" placeholder="Gửi em yêu dấu">
+          </div>
+
+          <div class="field">
+            <label for="f-label">Nhãn nhỏ (không bắt buộc)</label>
+            <input type="text" id="f-label" name="label" placeholder="Để trống sẽ dùng nhãn mặc định của phong cách">
+          </div>
+
+          <div class="field">
+            <label>Nội dung</label>
+            <div id="para-list"></div>
+            <button type="button" id="add-para" class="add-para">+ Thêm đoạn văn</button>
+            <p class="hint">Bấm "+ Ngắt trang" giữa hai đoạn để tự chọn đoạn nào sang trang mới khi xem.</p>
+          </div>
+
+          <div class="field">
+            <label for="f-closing">Lời kết</label>
+            <input type="text" id="f-closing" name="closing" placeholder="Yêu em rất nhiều">
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="f-sign">Chữ ký</label>
+              <input type="text" id="f-sign" name="sign" placeholder="Anh">
+            </div>
+            <div class="field">
+              <label for="f-postscript">Tái bút</label>
+              <input type="text" id="f-postscript" name="postscript" placeholder="P.S. ...">
+            </div>
+          </div>
+
+          <button type="button" id="preview-btn" class="primary-btn">Xem thư</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Màn 4: Xem thư -->
+    <section id="screen-letter-preview" class="screen">
+      <div class="topbar">
+        <button type="button" id="letterpreview-back" class="icon-btn" aria-label="Quay lại">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <h2 id="preview-title">Xem thư</h2>
+      </div>
+      <iframe id="preview-frame" title="Xem thư"></iframe>
+      <div class="bottom-bar">
+        <button type="button" id="download-btn" class="secondary-btn">Tải file thư (.html)</button>
+        <div class="bottom-bar-row">
+          <button type="button" id="save-draft-btn" class="secondary-btn">Lưu nháp</button>
+          <button type="button" id="share-btn" class="primary-btn">Chia sẻ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chỉ hiện trên laptop (xem CSS desktop) khi chưa chọn thư/thao tác nào bên phải -->
+    <section id="screen-detail-empty" class="screen detail-empty">
+      <div class="detail-empty-inner">
+        <span class="detail-empty-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </span>
+        <h2>Chọn một lá thư để xem</h2>
+        <p>Hoặc bấm "Viết thư mới" ở bên trái để bắt đầu một lá thư khác.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/app/js/templates-data.js"></script>
+  <script src="/app/js/tiny-jinja.js"></script>
+  <script src="/app/js/render.js"></script>
+  <script src="/app/js/app.js"></script>
+</body>
+</html>

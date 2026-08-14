@@ -1,0 +1,24 @@
+# ============================================================
+# FILE NỘI DUNG THƯ
+# Điền nội dung của bạn vào đây. Có thể tạo nhiều file .yaml
+# khác nhau trong thư mục content/ cho nhiều bức thư khác nhau.
+# ============================================================
+
+title: "Gửi người thương"             # Tiêu đề / chủ đề bức thư (hiện ở tab trình duyệt)
+date: "20 tháng 7, 2026"              # Ngày viết thư
+greeting: "Gửi em yêu dấu"            # Câu chào mở đầu
+label: ""                             # Nhãn nhỏ trên đầu thư (VD: "Hơi Ấm Trao Em"). Để trống "" sẽ dùng nhãn mặc định của từng template
+
+# Nội dung thư: danh sách các trang, mỗi trang là danh sách đoạn văn.
+# Mỗi gạch đầu dòng cấp 1 là một trang; các gạch đầu dòng cấp 2 bên trong
+# là các đoạn văn thuộc trang đó — tự chọn đoạn nào sang trang nào.
+content:
+  - - "Không biết bắt đầu từ đâu, chỉ biết rằng khi ngồi xuống viết những dòng này, là lúc anh đang nhớ em rất nhiều."
+    - "Những ngày gần đây bận rộn hơn, nhưng mỗi lần nghĩ đến em, mọi mệt mỏi dường như tan biến. Em là lý do khiến những điều bình thường trở nên đáng nhớ."
+
+  - - "Cảm ơn em vì đã luôn ở đó, kiên nhẫn lắng nghe và tin tưởng anh ngay cả những lúc anh chưa thật sự tin vào chính mình."
+    - "Anh mong mình sẽ tiếp tục đi cùng nhau thật lâu, thật xa."
+
+closing: "Yêu em rất nhiều"           # Lời kết
+sign: "Tùng"                          # Chữ ký cuối thư
+postscript: "P.S. Cuối tuần này mình đi xem phim như đã hẹn nhé?"   # Tái bút (có thể để trống "")
