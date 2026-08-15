@@ -12,6 +12,7 @@ love-letter-project/
 │   ├── template_am_ap.html      → Ấm áp — tình cảm gần gũi, ấm cúng
 │   ├── template_nong_nan.html   → Nồng nàn — tình yêu say đắm, cháy bỏng
 │   ├── template_nho_nhung.html  → Nhớ nhung — khắc khoải, tình yêu xa cách
+│   ├── template_dem_nho.html    → Đêm nhớ — trời đêm sao trăng, nỗi nhớ xa xăm
 │   ├── template_ngot_ngao.html  → Ngọt ngào — tươi trẻ, rung động vui tươi
 │   ├── template_binh_yen.html   → Bình yên — êm đềm, gắn bó lâu dài
 │   ├── template_xin_loi.html    → Xin lỗi — chân thành, làm hoà
@@ -48,7 +49,7 @@ Mỗi gạch đầu dòng cấp 1 là một trang; các gạch đầu dòng cấ
 Tất cả template dùng **font hệ thống có sẵn trên máy người xem** (không tải font ngoài qua Google Fonts hay bất kỳ CDN nào):
 
 - Phần nội dung/tiêu đề bo tròn (Ấm áp, Ngọt ngào, Giận dỗi...): `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` — trên iPhone/Mac là San Francisco, trên Android là Roboto.
-- Phần tiêu đề/chữ ký kiểu chữ nghiêng trang trọng (Nồng nàn, Nhớ nhung, Bình yên, Xin lỗi): `'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif` — Palatino Linotype có sẵn trên Windows, Palatino có sẵn trên macOS/iOS, thanh thoát hơn Georgia.
+- Phần tiêu đề/chữ ký kiểu chữ nghiêng trang trọng (Nồng nàn, Nhớ nhung, Đêm nhớ, Bình yên, Xin lỗi): `'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif` — Palatino Linotype có sẵn trên Windows, Palatino có sẵn trên macOS/iOS, thanh thoát hơn Georgia.
 
 **Vì sao không dùng Google Fonts nữa:** ban đầu dự án dùng Google Fonts (kể cả bản tự nhúng base64 không cần mạng), nhưng khi mở bằng trình xem HTML tích hợp sẵn trong một số app nhắn tin (ví dụ Messenger), trình xem đó có thể bỏ qua mọi CSS/font tuỳ chỉnh và tự vẽ chữ bằng font mặc định của nó — lúc đó dấu tiếng Việt phức tạp (ư, ơ, các dấu thanh) dễ hiển thị sai dù font đã nhúng sẵn trong file. Dùng thẳng font hệ thống là cách duy nhất đảm bảo hiển thị đúng trong mọi trình xem, vì đó chính là font mà hệ điều hành dùng để hiển thị tiếng Việt trên toàn bộ giao diện máy.
 
