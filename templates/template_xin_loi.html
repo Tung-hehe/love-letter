@@ -18,7 +18,9 @@
   html,body{margin:0;padding:0;}
   body{
     position:relative;
-    background: linear-gradient(165deg, #b7c2d1 0%, #d9d3c9 55%, #f1e3c4 100%);
+    background:
+      radial-gradient(rgba(255,255,255,0.4) 1.2px, transparent 1.4px) 0 0/20px 20px,
+      linear-gradient(165deg, #8fa2ba 0%, #b7c2d1 28%, #d9d3c9 58%, #f6dfa8 100%);
     min-height:100vh;
     display:flex;
     align-items:center;
@@ -30,6 +32,19 @@
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
     text-rendering:optimizeLegibility;
+  }
+  .card-glow{
+    position:fixed;
+    width:420px; height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(246,198,103,0.4), transparent 70%);
+    filter:blur(30px);
+    animation: glow-breathe 6.5s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.6; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.06); }
   }
   .note-wrap{
     position:relative;
@@ -88,6 +103,11 @@
     letter-spacing:0.12em;
     text-transform:uppercase;
     color: var(--rain-deep);
+    animation: eyebrow-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes eyebrow-breathe{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.045); }
   }
   .date{
     text-align:center;
@@ -112,12 +132,21 @@
     align-items:center;
     gap:8px;
     margin-bottom:24px;
-    opacity:0.7;
+    animation: divider-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes divider-pulse{
+    0%,100%{ opacity:0.7; }
+    50%{ opacity:0.35; }
   }
   .divider .line{
     width:32px;
     height:1px;
     background: var(--sun);
+  }
+  .body-text{
+    border-left:2px solid rgba(74,85,104,0.28);
+    padding-left:18px;
+    margin:0 6px;
   }
   .body-text p{
     font-size:clamp(15px, 2vw, 16.5px);
@@ -154,8 +183,8 @@
     animation: dove-bob 2.4s ease-in-out infinite;
   }
   @keyframes dove-bob{
-    0%,100%{ transform:translateY(0); }
-    50%{ transform:translateY(-4px); }
+    0%,100%{ transform:translateY(0); opacity:0.85; }
+    50%{ transform:translateY(-4px); opacity:1; }
   }
   .ps{
     margin-top:24px;
@@ -166,16 +195,21 @@
     font-style:italic;
     color: var(--ink);
   }
-  .float.f1{ top:11%; left:7%; font-size:26px; }
-  .float.f2{ top:19%; right:8%; font-size:18px; animation-delay:1s; }
-  .float.f3{ bottom:17%; left:9%; font-size:20px; animation-delay:2s; }
-  .float.f4{ bottom:23%; right:6%; font-size:24px; animation-delay:0.5s; }
+  .float.f1{ top:11%; left:7%; font-size:28px; }
+  .float.f2{ top:19%; right:8%; font-size:20px; animation-delay:1s; }
+  .float.f3{ bottom:17%; left:9%; font-size:22px; animation-delay:2s; }
+  .float.f4{ bottom:23%; right:6%; font-size:26px; animation-delay:0.5s; }
+  .float.f5{ top:6%; left:38%; font-size:18px; animation-delay:1.6s; }
+  .float.f6{ top:9%; right:35%; font-size:24px; animation-delay:2.4s; }
+  .float.f7{ bottom:8%; left:42%; font-size:20px; animation-delay:0.8s; }
+  .float.f8{ bottom:11%; right:39%; font-size:17px; animation-delay:3s; }
   .float{
     position:fixed;
     color: var(--sun);
-    opacity:0.6;
+    opacity:0.85;
     animation: bob 4.5s ease-in-out infinite;
     z-index:0;
+    filter: drop-shadow(0 0 9px rgba(246,198,103,0.85));
   }
   @keyframes bob{
     0%,100%{ transform:translateY(0) rotate(0deg); }
@@ -231,14 +265,14 @@
     pointer-events:none;
   }
   @keyframes mote-calm{
-    0%{ transform:translateY(0) translateX(0) scale(0.7); opacity:0; }
-    14%{ opacity:0.75; }
-    50%{ transform:translateY(-52px) translateX(2px) scale(1); opacity:0.9; }
-    88%{ opacity:0.18; }
-    100%{ transform:translateY(-104px) translateX(-2px) scale(0.65); opacity:0; }
+    0%{ transform:translateY(0) translateX(0) scale(0.6); opacity:0; }
+    14%{ opacity:0.4; }
+    50%{ transform:translateY(-52px) translateX(2px) scale(0.8); opacity:0.45; }
+    88%{ opacity:0.1; }
+    100%{ transform:translateY(-104px) translateX(-2px) scale(0.55); opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
-    .sorry-heart, .float, .page, .fx-mote{ animation:none; }
+    .sorry-heart, .float, .page, .fx-mote, .card-glow, .seal, .divider, .eyebrow{ animation:none; }
   }
   @media (max-width:480px){
     .note-body{ padding:8px 22px 34px; }
@@ -246,11 +280,15 @@
     .tape.left{ left:12px; }
     .tape.right{ right:10px; }
     .doodle{ top:26px; right:12px; width:30px; height:30px; }
-    .float{ opacity:0.45; }
+    .float{ opacity:0.7; }
     .float.f1{ top:6%; left:2%; font-size:16px; }
     .float.f2{ top:15%; right:2%; font-size:13px; }
     .float.f3{ bottom:10%; left:2%; font-size:12px; }
     .float.f4{ bottom:17%; right:2%; font-size:15px; }
+    .float.f5{ top:4%; left:32%; font-size:11px; }
+    .float.f6{ top:12%; right:30%; font-size:14px; }
+    .float.f7{ bottom:4%; left:36%; font-size:12px; }
+    .float.f8{ bottom:14%; right:34%; font-size:10px; }
   }
 
   /* --- Hiệu ứng mở thư --- */
@@ -319,8 +357,17 @@
     box-shadow:0 6px 14px rgba(0,0,0,0.22);
     z-index:3;
     transition:opacity 0.25s ease, transform 0.25s ease;
+    animation: seal-tremble 2.8s ease-in-out infinite;
+  }
+  @keyframes seal-tremble{
+    0%,100%{ transform:translate(-50%,-50%) rotate(0deg); }
+    20%{ transform:translate(-50%,-50%) rotate(-3deg); }
+    40%{ transform:translate(-50%,-50%) rotate(2.5deg); }
+    60%{ transform:translate(-50%,-50%) rotate(-2.5deg); }
+    80%{ transform:translate(-50%,-50%) rotate(2deg); }
   }
   .envelope.opening .seal{
+    animation:none;
     opacity:0;
     transform:translate(-50%,-50%) scale(0.5);
   }
@@ -369,10 +416,15 @@
       <div class="envelope-hint">Chạm để mở thư</div>
     </div>
   </div>
+  <div class="card-glow"></div>
   <span class="float f1">✧</span>
   <span class="float f2">✦</span>
   <span class="float f3">✧</span>
   <span class="float f4">✦</span>
+  <span class="float f5">✦</span>
+  <span class="float f6">✧</span>
+  <span class="float f7">✦</span>
+  <span class="float f8">✧</span>
   <div class="note-wrap" id="letter-card">
     <div class="tape left"></div>
     <div class="tape right"></div>
@@ -388,20 +440,20 @@
       <path d="M9.3 15.8 Q12 14.9 14.7 15.8"/>
     </svg>
     <div class="note-body">
-      <span class="fx-mote" style="width:6px; height:6px; left:8%; bottom:9%; animation-delay:0s;"></span>
-      <span class="fx-mote" style="width:4px; height:4px; left:18%; bottom:50%; animation-delay:0.94s;"></span>
-      <span class="fx-mote" style="width:5px; height:5px; left:30%; bottom:24%; animation-delay:1.9s;"></span>
-      <span class="fx-mote" style="width:4px; height:4px; left:42%; bottom:64%; animation-delay:2.8s;"></span>
-      <span class="fx-mote" style="width:6px; height:6px; left:54%; bottom:13%; animation-delay:3.8s;"></span>
-      <span class="fx-mote" style="width:4px; height:4px; left:64%; bottom:42%; animation-delay:4.7s;"></span>
-      <span class="fx-mote" style="width:5px; height:5px; left:74%; bottom:68%; animation-delay:5.7s;"></span>
-      <span class="fx-mote" style="width:4px; height:4px; left:84%; bottom:22%; animation-delay:6.6s;"></span>
-      <span class="fx-mote" style="width:5px; height:5px; left:92%; bottom:54%; animation-delay:7.5s;"></span>
-      <span class="fx-mote" style="width:5px; height:5px; left:12%; bottom:74%; animation-delay:8.1s;"></span>
+      <span class="fx-mote" style="width:4px; height:4px; left:8%; bottom:9%; animation-delay:0s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:18%; bottom:50%; animation-delay:0.94s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:30%; bottom:24%; animation-delay:1.9s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:42%; bottom:64%; animation-delay:2.8s;"></span>
+      <span class="fx-mote" style="width:4px; height:4px; left:54%; bottom:13%; animation-delay:3.8s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:64%; bottom:42%; animation-delay:4.7s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:74%; bottom:68%; animation-delay:5.7s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:84%; bottom:22%; animation-delay:6.6s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:92%; bottom:54%; animation-delay:7.5s;"></span>
+      <span class="fx-mote" style="width:3px; height:3px; left:12%; bottom:74%; animation-delay:8.1s;"></span>
       <div class="eyebrow-wrap"><div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>{{ label or "Xin Lỗi" }}</div></div>
       <div class="date">{{ date }}</div>
       <div class="greeting">{{ greeting }}</div>
-      <div class="divider"><span class="line"></span><span class="line"></span></div>
+      <div class="divider"><span class="line"></span><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--sun);" aria-hidden="true"><path d="M12 2C9 7 6 10.5 6 14.5A6 6 0 0 0 18 14.5C18 10.5 15 7 12 2z"/></svg><span class="line"></span></div>
       {% set pages = content %}
       <div class="pages" id="letter-pages">
         {% for page in pages %}

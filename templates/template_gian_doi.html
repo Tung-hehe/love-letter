@@ -78,6 +78,11 @@
     letter-spacing:0.12em;
     text-transform:uppercase;
     color: var(--pout-deep);
+    animation: eyebrow-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes eyebrow-breathe{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.045); }
   }
   .status{
     display:flex;
@@ -109,7 +114,16 @@
     font-size:14.5px;
     letter-spacing:0.04em;
     margin-bottom:22px;
-    opacity:0.85;
+    animation: divider-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes divider-pulse{
+    0%,100%{ opacity:0.85; }
+    50%{ opacity:0.4; }
+  }
+  .body-text{
+    border-left:2px solid rgba(224,83,47,0.32);
+    padding-left:18px;
+    margin:0 6px;
   }
   .body-text p{
     font-size:clamp(15.5px, 2.1vw, 17px);
@@ -143,6 +157,11 @@
     margin-top:10px;
     color: var(--sun);
     display:inline-block;
+    animation: soften-heart 2.4s ease-in-out infinite;
+  }
+  @keyframes soften-heart{
+    0%,100%{ transform:scale(1); color:var(--sun); }
+    50%{ transform:scale(1.2); color:var(--pout-deep); }
   }
   .ps{
     margin-top:24px;
@@ -153,20 +172,42 @@
     font-size:15px;
     color: var(--ink);
   }
-  .float.f1{ top:12%; left:8%; font-size:18px; }
-  .float.f2{ top:20%; right:9%; font-size:13px; animation-delay:1s; }
-  .float.f3{ bottom:16%; left:10%; font-size:15px; animation-delay:2s; }
-  .float.f4{ bottom:22%; right:7%; font-size:16px; animation-delay:0.5s; }
+  .float.f1{ top:12%; left:8%; font-size:24px; }
+  .float.f2{ top:20%; right:9%; font-size:19px; animation-delay:1s; }
+  .float.f3{ bottom:16%; left:10%; font-size:21px; animation-delay:2s; }
+  .float.f4{ bottom:22%; right:7%; font-size:20px; animation-delay:0.5s; }
+  .float.f5{ top:7%; left:38%; font-size:18px; animation-delay:1.6s; }
+  .float.f6{ top:9%; right:36%; font-size:22px; animation-delay:2.4s; }
+  .float.f7{ bottom:7%; left:41%; font-size:19px; animation-delay:0.8s; }
+  .float.f8{ bottom:10%; right:39%; font-size:16px; animation-delay:3s; }
   .float{
     position:fixed;
     color: #fff;
-    opacity:0.5;
+    opacity:0.85;
     animation: bob 4.5s ease-in-out infinite;
     z-index:0;
+    filter: drop-shadow(0 3px 10px rgba(74,51,42,0.4));
+  }
+  .float.f2, .float.f4, .float.f6, .float.f8{
+    color: var(--sun);
+    filter: drop-shadow(0 0 10px rgba(255,203,92,0.9));
   }
   @keyframes bob{
     0%,100%{ transform:translateY(0) rotate(0deg); }
     50%{ transform:translateY(-14px) rotate(8deg); }
+  }
+  .card-glow{
+    position:fixed;
+    width:420px; height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,122,89,0.4), transparent 70%);
+    filter:blur(30px);
+    animation: glow-breathe 6s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.65; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.06); }
   }
   .pages{ position:relative; }
   .page{ display:none; }
@@ -218,25 +259,29 @@
     pointer-events:none;
   }
   @keyframes mote-bounce{
-    0%{ transform:translateY(0) translateX(0) scale(0.6); opacity:0; }
-    10%{ opacity:0.85; }
-    30%{ transform:translateY(-24px) translateX(-9px) scale(0.9); }
-    50%{ transform:translateY(-48px) translateX(9px) scale(1); opacity:1; }
-    70%{ transform:translateY(-70px) translateX(-6px) scale(0.85); }
-    88%{ opacity:0.2; }
-    100%{ transform:translateY(-98px) translateX(6px) scale(0.6); opacity:0; }
+    0%{ transform:translateY(0) translateX(0) scale(0.5); opacity:0; }
+    10%{ opacity:0.45; }
+    30%{ transform:translateY(-24px) translateX(-9px) scale(0.75); }
+    50%{ transform:translateY(-48px) translateX(9px) scale(0.85); opacity:0.5; }
+    70%{ transform:translateY(-70px) translateX(-6px) scale(0.7); }
+    88%{ opacity:0.1; }
+    100%{ transform:translateY(-98px) translateX(6px) scale(0.5); opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
-    .float, .page, .fx-mote{ animation:none; }
+    .float, .page, .fx-mote, .card-glow, .envelope-body, .seal, .heart-outline, .divider, .eyebrow{ animation:none; }
   }
   @media (max-width:480px){
     .note{ padding:36px 24px 36px; }
     .doodle{ right:18px; }
-    .float{ opacity:0.4; }
+    .float{ opacity:0.65; }
     .float.f1{ top:6%; left:2%; font-size:16px; }
     .float.f2{ top:15%; right:2%; font-size:13px; }
     .float.f3{ bottom:10%; left:2%; font-size:12px; }
     .float.f4{ bottom:17%; right:2%; font-size:15px; }
+    .float.f5{ top:3%; left:32%; font-size:11px; }
+    .float.f6{ top:11%; right:29%; font-size:14px; }
+    .float.f7{ bottom:3%; left:35%; font-size:12px; }
+    .float.f8{ bottom:13%; right:33%; font-size:10px; }
   }
 
   /* --- Hiệu ứng mở thư --- */
@@ -273,7 +318,16 @@
     border-radius:10px;
     box-shadow:0 20px 45px rgba(0,0,0,0.28);
     overflow:hidden;
+    animation: pout-shake 3.2s ease-in-out infinite;
   }
+  @keyframes pout-shake{
+    0%,86%,100%{ transform:rotate(0deg); }
+    89%{ transform:rotate(-2.5deg); }
+    91.5%{ transform:rotate(2deg); }
+    94%{ transform:rotate(-1.5deg); }
+    96.5%{ transform:rotate(1deg); }
+  }
+  .envelope.opening .envelope-body{ animation:none; }
   .envelope-flap{
     position:absolute;
     top:0; left:0;
@@ -305,8 +359,17 @@
     box-shadow:0 6px 14px rgba(0,0,0,0.25);
     z-index:3;
     transition:opacity 0.25s ease, transform 0.25s ease;
+    animation: seal-tremble 2.6s ease-in-out infinite;
+  }
+  @keyframes seal-tremble{
+    0%,100%{ transform:translate(-50%,-50%) rotate(0deg); }
+    20%{ transform:translate(-50%,-50%) rotate(-4deg); }
+    40%{ transform:translate(-50%,-50%) rotate(3deg); }
+    60%{ transform:translate(-50%,-50%) rotate(-3deg); }
+    80%{ transform:translate(-50%,-50%) rotate(2deg); }
   }
   .envelope.opening .seal{
+    animation:none;
     opacity:0;
     transform:translate(-50%,-50%) scale(0.5);
   }
@@ -355,21 +418,26 @@
       <div class="envelope-hint">Chạm để mở thư</div>
     </div>
   </div>
-  <span class="float f1">✱</span>
-  <span class="float f2">✱</span>
-  <span class="float f3">✱</span>
+  <div class="card-glow"></div>
+  <span class="float f1">☁</span>
+  <span class="float f2">⚡</span>
+  <span class="float f3">☁</span>
   <span class="float f4">✱</span>
+  <span class="float f5">☁</span>
+  <span class="float f6">⚡</span>
+  <span class="float f7">✱</span>
+  <span class="float f8">☁</span>
   <div class="note" id="letter-card">
-    <span class="fx-mote" style="width:6px; height:6px; left:8%; bottom:10%; animation-delay:0s;"></span>
-    <span class="fx-mote" style="width:4px; height:4px; left:18%; bottom:52%; animation-delay:0.7s;"></span>
-    <span class="fx-mote" style="width:5px; height:5px; left:30%; bottom:26%; animation-delay:1.4s;"></span>
-    <span class="fx-mote" style="width:4px; height:4px; left:42%; bottom:66%; animation-delay:2.1s;"></span>
-    <span class="fx-mote" style="width:5px; height:5px; left:54%; bottom:14%; animation-delay:2.8s;"></span>
-    <span class="fx-mote" style="width:4px; height:4px; left:64%; bottom:44%; animation-delay:3.5s;"></span>
-    <span class="fx-mote" style="width:6px; height:6px; left:74%; bottom:70%; animation-delay:4.2s;"></span>
-    <span class="fx-mote" style="width:4px; height:4px; left:84%; bottom:24%; animation-delay:4.9s;"></span>
-    <span class="fx-mote" style="width:5px; height:5px; left:92%; bottom:56%; animation-delay:5.6s;"></span>
-    <span class="fx-mote" style="width:5px; height:5px; left:12%; bottom:76%; animation-delay:6.1s;"></span>
+    <span class="fx-mote" style="width:4px; height:4px; left:8%; bottom:10%; animation-delay:0s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:18%; bottom:52%; animation-delay:0.7s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:30%; bottom:26%; animation-delay:1.4s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:42%; bottom:66%; animation-delay:2.1s;"></span>
+    <span class="fx-mote" style="width:4px; height:4px; left:54%; bottom:14%; animation-delay:2.8s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:64%; bottom:44%; animation-delay:3.5s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:74%; bottom:70%; animation-delay:4.2s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:84%; bottom:24%; animation-delay:4.9s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:92%; bottom:56%; animation-delay:5.6s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:12%; bottom:76%; animation-delay:6.1s;"></span>
     <svg class="doodle" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="9"/>
       <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none"/>

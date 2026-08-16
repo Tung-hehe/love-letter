@@ -13,12 +13,16 @@
     --ink: #3a3226;
     --ink-soft: #8a8070;
     --stamp: #9a8f74;
+    --dusk: #7d6b95;
+    --amber: #d9a15c;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     position:relative;
-    background: linear-gradient(160deg, #e9e4d8 0%, #ddd6c6 100%);
+    background:
+      radial-gradient(rgba(255,255,255,0.22) 1.2px, transparent 1.4px) 0 0/20px 20px,
+      linear-gradient(160deg, #ded2c7 0%, #c9b8bd 35%, #a89aad 68%, var(--dusk) 100%);
     min-height:100vh;
     display:flex;
     align-items:center;
@@ -30,6 +34,19 @@
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
     text-rendering:optimizeLegibility;
+  }
+  .card-glow{
+    position:fixed;
+    width:420px; height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(217,161,92,0.3), transparent 70%);
+    filter:blur(32px);
+    animation: glow-breathe 6.5s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.6; transform:scale(1); }
+    50%{ opacity:0.92; transform:scale(1.06); }
   }
   .postcard-frame{
     position:relative;
@@ -72,6 +89,11 @@
     border-bottom:1px solid rgba(47,79,122,0.35);
     padding-bottom:4px;
     margin-bottom:22px;
+    animation: eyebrow-glow 3s ease-in-out infinite;
+  }
+  @keyframes eyebrow-glow{
+    0%,100%{ opacity:0.8; }
+    50%{ opacity:1; }
   }
   .date{
     font-size:12.5px;
@@ -88,6 +110,11 @@
     margin: 0 0 24px;
     line-height:1.35;
     max-width:22ch;
+  }
+  .body-text{
+    border-left:2px solid rgba(47,79,122,0.25);
+    padding-left:18px;
+    margin:0 6px;
   }
   .body-text p{
     font-size:clamp(15.5px, 2.1vw, 16.5px);
@@ -106,6 +133,11 @@
     gap:10px;
     margin:24px 0;
     color: var(--stamp);
+    animation: divider-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes divider-pulse{
+    0%,100%{ opacity:0.85; }
+    50%{ opacity:0.45; }
   }
   .divider::before, .divider::after{
     content:"";
@@ -115,6 +147,20 @@
   }
   .closing{
     margin-top:6px;
+  }
+  .signature-wrap{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .mail-icon{
+    color: var(--stripe-blue);
+    display:inline-block;
+    animation: drift-away 2.6s ease-in-out infinite;
+  }
+  @keyframes drift-away{
+    0%,100%{ transform:translate(0,0) rotate(0deg); opacity:0.8; }
+    50%{ transform:translate(4px,-3px) rotate(8deg); opacity:1; }
   }
   .closing-text{
     font-size:14.5px;
@@ -138,16 +184,25 @@
     font-style:italic;
     color: var(--ink);
   }
-  .float.f1{ top:10%; left:8%; font-size:20px; }
-  .float.f2{ top:18%; right:9%; font-size:14px; animation-delay:1s; }
-  .float.f3{ bottom:16%; left:10%; font-size:16px; animation-delay:2s; }
-  .float.f4{ bottom:22%; right:7%; font-size:18px; animation-delay:0.5s; }
+  .float.f1{ top:10%; left:8%; font-size:22px; }
+  .float.f2{ top:18%; right:9%; font-size:18px; animation-delay:1s; }
+  .float.f3{ bottom:16%; left:10%; font-size:20px; animation-delay:2s; }
+  .float.f4{ bottom:22%; right:7%; font-size:19px; animation-delay:0.5s; }
+  .float.f5{ top:7%; left:38%; font-size:17px; animation-delay:1.6s; }
+  .float.f6{ top:9%; right:36%; font-size:15px; animation-delay:2.4s; }
+  .float.f7{ bottom:8%; left:41%; font-size:16px; animation-delay:0.8s; }
+  .float.f8{ bottom:11%; right:39%; font-size:20px; animation-delay:3s; }
   .float{
     position:fixed;
-    color: var(--stamp);
-    opacity:0.45;
+    color: var(--paper);
+    opacity:0.65;
     animation: bob 4.5s ease-in-out infinite;
     z-index:0;
+    filter: drop-shadow(0 2px 6px rgba(58,50,38,0.4));
+  }
+  .float.f2, .float.f4, .float.f6, .float.f8{
+    color: var(--amber);
+    filter: drop-shadow(0 0 8px rgba(217,161,92,0.65));
   }
   @keyframes bob{
     0%,100%{ transform:translateY(0) rotate(0deg); }
@@ -210,16 +265,20 @@
     100%{ transform:translateY(-104px) translateX(-2px) scale(0.65); opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
-    .float, .page, .fx-mote{ animation:none; }
+    .float, .page, .fx-mote, .card-glow, .eyebrow, .divider, .mail-icon, .seal, .postmark{ animation:none; }
   }
   @media (max-width:480px){
     .postcard{ padding:36px 22px 30px; }
     .postmark{ width:52px; top:16px; right:16px; }
-    .float{ opacity:0.35; }
+    .float{ opacity:0.5; }
     .float.f1{ top:6%; left:2%; font-size:16px; }
     .float.f2{ top:15%; right:2%; font-size:13px; }
     .float.f3{ bottom:10%; left:2%; font-size:12px; }
     .float.f4{ bottom:17%; right:2%; font-size:15px; }
+    .float.f5{ top:3%; left:32%; font-size:11px; }
+    .float.f6{ top:11%; right:29%; font-size:13px; }
+    .float.f7{ bottom:3%; left:35%; font-size:12px; }
+    .float.f8{ bottom:13%; right:33%; font-size:14px; }
   }
 
   /* --- Hiệu ứng mở thư --- */
@@ -288,8 +347,17 @@
     box-shadow:0 6px 14px rgba(0,0,0,0.25);
     z-index:3;
     transition:opacity 0.25s ease, transform 0.25s ease;
+    animation: seal-tremble 2.8s ease-in-out infinite;
+  }
+  @keyframes seal-tremble{
+    0%,100%{ transform:translate(-50%,-50%) rotate(0deg); }
+    20%{ transform:translate(-50%,-50%) rotate(-3deg); }
+    40%{ transform:translate(-50%,-50%) rotate(2.5deg); }
+    60%{ transform:translate(-50%,-50%) rotate(-2.5deg); }
+    80%{ transform:translate(-50%,-50%) rotate(2deg); }
   }
   .envelope.opening .seal{
+    animation:none;
     opacity:0;
     transform:translate(-50%,-50%) scale(0.5);
   }
@@ -317,10 +385,19 @@
     opacity:1;
     transform:translateY(0) scale(1);
   }
+  #letter-card.card-visible .postmark{
+    animation: stamp-thump 0.6s ease 0.5s 1;
+  }
+  @keyframes stamp-thump{
+    0%{ transform:scale(1.7) rotate(-10deg); opacity:0; }
+    60%{ transform:scale(0.92) rotate(2deg); opacity:0.9; }
+    100%{ transform:scale(1) rotate(0deg); opacity:0.75; }
+  }
   @media (prefers-reduced-motion: reduce){
     .envelope-flap{ transition:transform 0.01s linear; }
     .envelope-hint{ animation:none; }
     #letter-card{ transition:opacity 0.2s linear; transform:none; }
+    #letter-card.card-visible .postmark{ animation:none; }
   }
 </style>
 </head>
@@ -334,10 +411,15 @@
       <div class="envelope-hint">Chạm để mở thư</div>
     </div>
   </div>
-  <span class="float f1">✦</span>
-  <span class="float f2">✧</span>
-  <span class="float f3">✦</span>
-  <span class="float f4">✧</span>
+  <div class="card-glow"></div>
+  <span class="float f1">✈</span>
+  <span class="float f2">✦</span>
+  <span class="float f3">✈</span>
+  <span class="float f4">✦</span>
+  <span class="float f5">✦</span>
+  <span class="float f6">✈</span>
+  <span class="float f7">✦</span>
+  <span class="float f8">✈</span>
   <div class="postcard-frame" id="letter-card">
     <div class="postcard">
       <span class="fx-mote" style="width:6px; height:6px; left:8%; bottom:9%; animation-delay:0s;"></span>
@@ -371,7 +453,10 @@
           <div class="divider">✦</div>
           <div class="closing">
             <div class="closing-text">{{ closing }}</div>
-            <div class="signature">{{ sign }}</div>
+            <div class="signature-wrap">
+              <span class="signature">{{ sign }}</span>
+              <span class="mail-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></span>
+            </div>
           </div>
           {% if postscript %}
           <div class="ps">{{ postscript }}</div>
