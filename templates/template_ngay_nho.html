@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<title>{{ title or "Ngày Nhớ"}}</title>
+<style>
+  :root{
+    --sky: #eaf4fb;
+    --sky-deep: #4f7ca6;
+    --sky-ink: #33465c;
+    --cloud: #ffffff;
+    --cloud-shadow: #cfe1ef;
+    --sun: #ffd77a;
+    --sun-glow: #fff3d9;
+    --gold: #f0a94a;
+    --gold-deep: #c9861f;
+    --ink: #37485c;
+    --ink-soft: rgba(55,72,92,0.62);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;touch-action:manipulation;}
+  body{
+    position:relative;
+    background: linear-gradient(160deg, #bfe0f5 0%, #eaf4fb 45%, #fdf0da 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    text-rendering:optimizeLegibility;
+  }
+  .cloud-layer{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+  .cloud{
+    position:absolute;
+    top:var(--top, 10%);
+    left:0;
+    width:var(--w, 90px);
+    height:var(--h, 30px);
+    background: var(--cloud);
+    border-radius:var(--br, 50px);
+    opacity:0;
+    filter:blur(0.3px);
+    animation: cloud-drift var(--dur, 70s) linear infinite;
+    animation-delay: var(--delay, 0s);
+    pointer-events:none;
+  }
+  .cloud::before, .cloud::after{
+    content:"";
+    position:absolute;
+    background: var(--cloud);
+    border-radius:50%;
+  }
+  .cloud::before{
+    width:var(--b1-w, 55%); height:var(--b1-h, 150%);
+    top:var(--b1-t, -65%); left:var(--b1-l, 8%);
+  }
+  .cloud::after{
+    width:var(--b2-w, 42%); height:var(--b2-h, 120%);
+    top:var(--b2-t, -50%); right:var(--b2-r, 10%);
+    opacity:var(--b2-o, 1);
+  }
+  @keyframes cloud-drift{
+    0%{ transform: translate(-24vw, 0); opacity:0; }
+    8%{ opacity: var(--op, 0.65); }
+    50%{ transform: translate(58vw, -8px); }
+    92%{ opacity: var(--op, 0.65); }
+    100%{ transform: translate(140vw, 0); opacity:0; }
+  }
+  .bird{
+    position:absolute;
+    top:var(--top, 14%);
+    left:0;
+    width:var(--size, 24px);
+    height:calc(var(--size, 24px) * 0.46);
+    opacity:0;
+    animation: bird-fly var(--dur, 18s) linear infinite;
+    animation-delay: var(--delay, 0s);
+    pointer-events:none;
+  }
+  .bird svg{ width:100%; height:100%; display:block; overflow:visible; }
+  .bird .wing-b{ opacity:0; }
+  .bird .wing-a{ animation: bird-flap var(--flap, 0.46s) steps(1, end) infinite; }
+  .bird .wing-b{ animation: bird-flap var(--flap, 0.46s) steps(1, end) infinite reverse; }
+  @keyframes bird-flap{
+    0%, 49%{ opacity:1; }
+    50%, 100%{ opacity:0; }
+  }
+  @keyframes bird-fly{
+    0%{ transform: translate(-10vw, 0); opacity:0; }
+    8%{ opacity: var(--op, 0.55); }
+    22%{ transform: translate(16vw, -9px); }
+    36%{ transform: translate(32vw, 3px); }
+    50%{ transform: translate(50vw, -12px); }
+    64%{ transform: translate(68vw, 2px); }
+    78%{ transform: translate(86vw, -8px); }
+    92%{ opacity: var(--op, 0.5); }
+    100%{ transform: translate(112vw, 5px); opacity:0; }
+  }
+  .card-glow{
+    position:fixed;
+    width:440px; height:440px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(240,169,74,0.16), rgba(191,224,245,0.08) 55%, transparent 72%);
+    filter:blur(36px);
+    animation: glow-breathe 7s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.6; transform:scale(1); }
+    50%{ opacity:0.92; transform:scale(1.06); }
+  }
+  .card{
+    position:relative;
+    width:100%;
+    max-width:600px;
+    background: linear-gradient(155deg, #ffffff 0%, var(--sky) 100%);
+    border-radius:16px;
+    border:1px solid rgba(79,124,166,0.22);
+    box-shadow: 0 24px 55px rgba(79,124,166,0.24), 0 1px 0 rgba(255,255,255,0.7) inset;
+    padding:52px 44px 46px;
+    overflow:hidden;
+    z-index:1;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:9px;
+    border:1px solid rgba(79,124,166,0.14);
+    border-radius:11px;
+    pointer-events:none;
+  }
+  .wm-sun{
+    position:absolute;
+    z-index:0;
+    top:8px;
+    right:8px;
+    width:104px;
+    height:104px;
+    opacity:0.72;
+    pointer-events:none;
+  }
+  .eyebrow-wrap{ display:flex; justify-content:center; position:relative; z-index:1; margin-bottom:18px; }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 18px;
+    background: rgba(79,124,166,0.08);
+    border:1px solid rgba(79,124,166,0.28);
+    border-radius:999px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color: var(--sky-deep);
+  }
+  .header{ position:relative; z-index:1; text-align:center; margin-bottom:4px; }
+  .date{
+    text-align:center;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color: var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .greeting{
+    position:relative;
+    z-index:1;
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:clamp(30px, 6vw, 42px);
+    color: var(--sky-ink);
+    text-align:center;
+    margin: 6px 0 24px;
+    line-height:1.35;
+  }
+  .divider{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin: 0 auto 30px;
+    color: var(--gold-deep);
+  }
+  .divider .line{
+    width:36px;
+    height:1.5px;
+    background: var(--sky-deep);
+    border-radius:3px;
+    opacity:0.4;
+  }
+  .body-text{
+    position:relative;
+    z-index:1;
+    border-left:2px solid rgba(79,124,166,0.22);
+    padding-left:18px;
+    margin: 0 6px;
+  }
+  .body-text p{
+    font-size:clamp(15.5px, 2.2vw, 17px);
+    font-weight:400;
+    line-height:1.9;
+    margin: 0 0 20px;
+    color: var(--ink);
+    text-align:justify;
+    text-align-last:left;
+  }
+  .body-text p:last-child{ margin-bottom:0; }
+  .body-text a, .ps a{ color:var(--gold-deep); text-decoration:underline; text-underline-offset:2px; }
+  .closing{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    margin-top:34px;
+  }
+  .closing-text{
+    font-size:15px;
+    font-style:italic;
+    color: var(--ink);
+    margin-bottom:6px;
+  }
+  .signature{
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:30px;
+    color: var(--gold-deep);
+    line-height:1.3;
+  }
+  .sparkle{
+    color: var(--gold-deep);
+    margin-top:12px;
+    display:inline-block;
+    animation: pulse-sparkle 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse-sparkle{
+    0%,100%{ transform:scale(1) rotate(0deg); }
+    50%{ transform:scale(1.15) rotate(8deg); }
+  }
+  .ps{
+    position:relative;
+    z-index:1;
+    margin-top:30px;
+    padding-top:16px;
+    border-top:1px solid rgba(79,124,166,0.2);
+    text-align:center;
+    font-size:14.5px;
+    font-style:italic;
+    color: var(--ink);
+  }
+  .pages{ position:relative; z-index:1; }
+  .page{ display:none; }
+  .page.active{ display:flex; flex-direction:column; justify-content:center; animation: page-fade 0.4s ease; }
+  @keyframes page-fade{
+    from{ opacity:0; transform:translateX(10px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .page-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    margin-top:30px;
+    position:relative;
+    z-index:1;
+  }
+  .page-nav .page-btn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid rgba(79,124,166,0.3);
+    background: rgba(79,124,166,0.08);
+    color: var(--sky-deep);
+    font-size:17px;
+    line-height:1;
+    padding:0;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .page-nav .page-btn:disabled{ opacity:0.28; cursor:default; }
+  .page-nav .page-btn:not(:disabled):active{ transform:scale(0.9); }
+  .page-dots{ display:flex; align-items:center; gap:7px; }
+  .page-dots .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background: rgba(79,124,166,0.3);
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .page-dots .dot.active{ background: var(--gold-deep); transform:scale(1.35); }
+  .fx-glint{
+    position:absolute;
+    border-radius:50%;
+    background: radial-gradient(circle, var(--glint-color, rgba(255,210,122,0.85)), transparent 72%);
+    filter: blur(0.5px);
+    animation: glint-rise 7.5s ease-in-out infinite;
+    z-index:0;
+    pointer-events:none;
+  }
+  @keyframes glint-rise{
+    0%{ transform:translateY(0) translateX(0) scale(0.7); opacity:0; }
+    12%{ opacity:0.85; }
+    50%{ transform:translateY(-46px) translateX(9px) scale(1); opacity:1; }
+    88%{ opacity:0.22; }
+    100%{ transform:translateY(-96px) translateX(-7px) scale(0.65); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cloud, .bird, .bird .wing-a, .bird .wing-b, .card-glow, .page, .fx-glint, .sparkle{ animation:none; }
+  }
+  @media (max-width:480px){
+    .card{ padding:44px 26px 36px; }
+    .wm-sun{ width:80px; height:80px; top:6px; right:6px; }
+  }
+
+  /* --- Hiệu ứng mở thư --- */
+  .envelope-scene{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+    transition:opacity 0.5s ease;
+  }
+  .envelope-scene.scene-hide{
+    opacity:0;
+    pointer-events:none;
+  }
+  .envelope{
+    position:relative;
+    width:min(320px, 86vw);
+    height:min(219px, 59vw);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    outline:none;
+    perspective:700px;
+  }
+  .envelope:focus-visible .envelope-body{
+    box-shadow:0 0 0 3px rgba(255,255,255,0.8), 0 20px 45px rgba(79,124,166,0.3);
+  }
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background: linear-gradient(155deg, #eaf4fb 0%, #cfe1ef 100%);
+    border-radius:10px;
+    box-shadow:0 20px 45px rgba(79,124,166,0.3);
+    overflow:hidden;
+  }
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:60%;
+    background:#bcd6ea;
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    transition:transform 0.7s cubic-bezier(.6,-0.28,.74,.05);
+    z-index:2;
+  }
+  .envelope.opening .envelope-flap{
+    transform:rotateX(-165deg);
+  }
+  .seal{
+    position:absolute;
+    top:38%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:54px; height:54px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--sky-ink);
+    font-size:18px;
+    box-shadow:0 6px 14px rgba(79,124,166,0.35);
+    z-index:3;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    animation: seal-tremble 2.8s ease-in-out infinite;
+  }
+  @keyframes seal-tremble{
+    0%,100%{ transform:translate(-50%,-50%) rotate(0deg); }
+    20%{ transform:translate(-50%,-50%) rotate(-3deg); }
+    40%{ transform:translate(-50%,-50%) rotate(2.5deg); }
+    60%{ transform:translate(-50%,-50%) rotate(-2.5deg); }
+    80%{ transform:translate(-50%,-50%) rotate(2deg); }
+  }
+  .envelope.opening .seal{
+    animation:none;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.5);
+  }
+  .envelope-hint{
+    position:absolute;
+    bottom:-32px;
+    left:0; right:0;
+    text-align:center;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:13px;
+    color: var(--sky-deep);
+    animation:hint-bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes hint-bounce{
+    0%,100%{ transform:translateY(0); opacity:0.85; }
+    50%{ transform:translateY(4px); opacity:1; }
+  }
+  .envelope.opening .envelope-hint{ opacity:0; }
+  #letter-card{
+    opacity:0;
+    transform:translateY(24px) scale(0.96);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  #letter-card.card-visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .envelope-flap{ transition:transform 0.01s linear; }
+    .envelope-hint{ animation:none; }
+    #letter-card{ transition:opacity 0.2s linear; transform:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="envelope-scene" id="envelope-scene">
+    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Nhấn để mở thư">
+      <div class="envelope-body">
+        <div class="envelope-flap"></div>
+        <div class="seal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+      </div>
+      <div class="envelope-hint">Chạm để mở thư</div>
+    </div>
+  </div>
+  <div class="cloud-layer" id="cloud-layer"></div>
+  <div class="cloud-layer" id="bird-layer"></div>
+  <div class="card-glow"></div>
+  <div class="card" id="letter-card">
+    <span class="fx-glint" style="width:3px; height:3px; left:8%; bottom:10%; animation-delay:0s;"></span>
+    <span class="fx-glint" style="width:2px; height:2px; left:18%; bottom:52%; animation-delay:0.8s; --glint-color:rgba(207,225,239,0.85);"></span>
+    <span class="fx-glint" style="width:3px; height:3px; left:30%; bottom:26%; animation-delay:1.6s;"></span>
+    <span class="fx-glint" style="width:2px; height:2px; left:42%; bottom:66%; animation-delay:2.4s; --glint-color:rgba(207,225,239,0.85);"></span>
+    <span class="fx-glint" style="width:3px; height:3px; left:54%; bottom:14%; animation-delay:3.2s;"></span>
+    <span class="fx-glint" style="width:2px; height:2px; left:64%; bottom:44%; animation-delay:4s; --glint-color:rgba(207,225,239,0.85);"></span>
+    <span class="fx-glint" style="width:3px; height:3px; left:74%; bottom:70%; animation-delay:4.8s;"></span>
+    <span class="fx-glint" style="width:2px; height:2px; left:84%; bottom:24%; animation-delay:5.6s; --glint-color:rgba(207,225,239,0.85);"></span>
+    <span class="fx-glint" style="width:3px; height:3px; left:92%; bottom:56%; animation-delay:6.3s;"></span>
+    <span class="fx-glint" style="width:3px; height:3px; left:12%; bottom:76%; animation-delay:6.8s;"></span>
+    <svg class="wm-sun" viewBox="0 0 140 140" aria-hidden="true">
+      <defs>
+        <radialGradient id="nn-sun-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--sun-glow)" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="var(--sun-glow)" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="nn-sun-core" cx="38%" cy="34%" r="72%">
+          <stop offset="0%" stop-color="var(--sun-glow)"/>
+          <stop offset="100%" stop-color="var(--sun)"/>
+        </radialGradient>
+        <linearGradient id="nn-cloud-shade" x1="0%" y1="0%" x2="30%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="100%" stop-color="var(--cloud-shadow)"/>
+        </linearGradient>
+        <filter id="nn-cloud-drop" x="-60%" y="-60%" width="220%" height="220%">
+          <feDropShadow dx="0" dy="2" stdDeviation="1.6" flood-color="var(--sky-deep)" flood-opacity="0.28"/>
+        </filter>
+      </defs>
+      <circle cx="92" cy="46" r="48" fill="url(#nn-sun-glow)"/>
+      <g stroke="var(--sun)" stroke-linecap="round">
+        <g stroke-width="2.6" opacity="0.7">
+          <line x1="92" y1="20" x2="92" y2="12"/>
+          <line x1="92" y1="72" x2="92" y2="80"/>
+          <line x1="66" y1="46" x2="58" y2="46"/>
+          <line x1="118" y1="46" x2="126" y2="46"/>
+        </g>
+        <g stroke-width="2" opacity="0.45">
+          <line x1="110.4" y1="27.6" x2="113.9" y2="24.1"/>
+          <line x1="73.6" y1="27.6" x2="70.1" y2="24.1"/>
+          <line x1="110.4" y1="64.4" x2="113.9" y2="67.9"/>
+          <line x1="73.6" y1="64.4" x2="70.1" y2="67.9"/>
+        </g>
+      </g>
+      <circle cx="92" cy="46" r="24" fill="url(#nn-sun-core)"/>
+      <ellipse cx="83" cy="37" rx="9" ry="6" fill="#fff" opacity="0.25"/>
+      <g fill="var(--gold)" opacity="0.5">
+        <circle cx="118" cy="18" r="1.5"/>
+        <circle cx="128" cy="30" r="1.2"/>
+        <circle cx="106" cy="12" r="1.1"/>
+      </g>
+      <g opacity="0.6" filter="url(#nn-cloud-drop)">
+        <ellipse cx="30" cy="83" rx="15" ry="7" fill="url(#nn-cloud-shade)" stroke="var(--cloud-shadow)" stroke-width="0.8" stroke-opacity="0.4"/>
+        <circle cx="23" cy="79" r="6" fill="url(#nn-cloud-shade)"/>
+        <circle cx="36" cy="78" r="7" fill="url(#nn-cloud-shade)"/>
+      </g>
+      <g filter="url(#nn-cloud-drop)">
+        <ellipse cx="63" cy="69" rx="25" ry="12" fill="url(#nn-cloud-shade)" stroke="var(--cloud-shadow)" stroke-width="1" stroke-opacity="0.55"/>
+        <circle cx="49" cy="63" r="11" fill="url(#nn-cloud-shade)" stroke="var(--cloud-shadow)" stroke-width="1" stroke-opacity="0.55"/>
+        <circle cx="68" cy="60" r="13" fill="url(#nn-cloud-shade)" stroke="var(--cloud-shadow)" stroke-width="1" stroke-opacity="0.55"/>
+        <circle cx="82" cy="66" r="9" fill="url(#nn-cloud-shade)" stroke="var(--cloud-shadow)" stroke-width="1" stroke-opacity="0.55"/>
+      </g>
+    </svg>
+    <div class="eyebrow-wrap"><div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>{{ label or "Ngày Nhớ" }}</div></div>
+    <div class="header">
+      <div class="date">{{ date }}</div>
+    </div>
+    <div class="greeting">{{ greeting }}</div>
+    <div class="divider"><span class="line"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><span class="line"></span></div>
+    {% set pages = content %}
+    <div class="pages" id="letter-pages">
+      {% for page in pages %}
+      <div class="page{% if loop.first %} active{% endif %}">
+        <div class="body-text">
+          {% for doan in page %}
+          <p>{{ doan }}</p>
+          {% endfor %}
+        </div>
+        {% if loop.last %}
+        <div class="closing">
+          <div class="closing-text">{{ closing }}</div>
+          <div class="signature">{{ sign }}</div>
+          <div class="sparkle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+        </div>
+        {% if postscript %}
+        <div class="ps">{{ postscript }}</div>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if pages|length > 1 %}
+    <div class="page-nav">
+      <button type="button" class="page-btn page-prev" aria-label="Trang trước" disabled>‹</button>
+      <div class="page-dots">
+        {% for page in pages %}
+        <span class="dot{% if loop.first %} active{% endif %}"></span>
+        {% endfor %}
+      </div>
+      <button type="button" class="page-btn page-next" aria-label="Trang sau">›</button>
+    </div>
+    {% endif %}
+  </div>
+
+<script>
+(function(){
+  var layer = document.getElementById('cloud-layer');
+  if(!layer) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced) return;
+
+  function rand(min, max){ return min + Math.random() * (max - min); }
+
+  var frag = document.createDocumentFragment();
+  var count = window.innerWidth < 480 ? 5 : 8;
+
+  for(var i = 0; i < count; i++){
+    var cloud = document.createElement('span');
+    cloud.className = 'cloud';
+
+    // Mây gần (to, rõ) trôi nhanh hơn mây xa (nhỏ, mờ) để tạo chiều sâu bầu trời.
+    var depth = Math.random();
+    var w = 70 + depth * 110;
+    var h = w * rand(0.26, 0.46);
+    var duration = 88 - depth * 46;
+    var opacity = 0.32 + depth * 0.46;
+    var wispy = Math.random() < 0.3;
+
+    cloud.style.setProperty('--top', rand(4, 46).toFixed(1) + '%');
+    cloud.style.setProperty('--w', w.toFixed(0) + 'px');
+    cloud.style.setProperty('--h', h.toFixed(0) + 'px');
+    cloud.style.setProperty('--br', (h * rand(0.4, 0.62)).toFixed(0) + 'px');
+    cloud.style.setProperty('--dur', duration.toFixed(1) + 's');
+    cloud.style.setProperty('--delay', (-rand(0, duration)).toFixed(1) + 's');
+    cloud.style.setProperty('--op', opacity.toFixed(2));
+
+    // Mỗi đám mây có bướu lệch tâm và tỉ lệ riêng để không trông giống bản sao thu phóng.
+    cloud.style.setProperty('--b1-w', rand(42, 66).toFixed(0) + '%');
+    cloud.style.setProperty('--b1-h', rand(120, 175).toFixed(0) + '%');
+    cloud.style.setProperty('--b1-t', -rand(48, 78).toFixed(0) + '%');
+    cloud.style.setProperty('--b1-l', rand(2, 22).toFixed(0) + '%');
+    if(wispy){
+      cloud.style.setProperty('--b2-o', '0');
+    } else {
+      cloud.style.setProperty('--b2-w', rand(26, 50).toFixed(0) + '%');
+      cloud.style.setProperty('--b2-h', rand(95, 145).toFixed(0) + '%');
+      cloud.style.setProperty('--b2-t', -rand(35, 65).toFixed(0) + '%');
+      cloud.style.setProperty('--b2-r', rand(2, 24).toFixed(0) + '%');
+    }
+
+    frag.appendChild(cloud);
+  }
+
+  layer.appendChild(frag);
+})();
+</script>
+<script>
+(function(){
+  var layer = document.getElementById('bird-layer');
+  if(!layer) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced) return;
+
+  function rand(min, max){ return min + Math.random() * (max - min); }
+  var wingUp = 'M2 8 Q6 2 10 8 Q14 2 18 8';
+  var wingDown = 'M2 7 Q6 10.5 10 7 Q14 10.5 18 7';
+
+  var frag = document.createDocumentFragment();
+  var count = window.innerWidth < 480 ? 2 : 3;
+
+  for(var i = 0; i < count; i++){
+    var bird = document.createElement('span');
+    bird.className = 'bird';
+
+    var size = rand(18, 29);
+    var duration = rand(14, 27);
+    var flap = rand(0.36, 0.6);
+    var opacity = rand(0.4, 0.62);
+
+    bird.style.setProperty('--top', rand(6, 38).toFixed(1) + '%');
+    bird.style.setProperty('--size', size.toFixed(0) + 'px');
+    bird.style.setProperty('--dur', duration.toFixed(1) + 's');
+    bird.style.setProperty('--delay', (-rand(0, duration)).toFixed(1) + 's');
+    bird.style.setProperty('--flap', flap.toFixed(2) + 's');
+    bird.style.setProperty('--op', opacity.toFixed(2));
+
+    bird.innerHTML = '<svg viewBox="0 0 24 12" aria-hidden="true">' +
+      '<path class="wing-a" d="' + wingUp + '" fill="none" stroke="var(--sky-deep)" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<path class="wing-b" d="' + wingDown + '" fill="none" stroke="var(--sky-deep)" stroke-width="1.6" stroke-linecap="round"/>' +
+      '</svg>';
+
+    frag.appendChild(bird);
+  }
+
+  layer.appendChild(frag);
+})();
+</script>
+<script>
+(function(){
+  var envelope = document.getElementById('envelope');
+  var scene = document.getElementById('envelope-scene');
+  var card = document.getElementById('letter-card');
+  if(!envelope || !scene || !card) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var opened = false;
+
+  function openLetter(){
+    if(opened) return;
+    opened = true;
+    envelope.classList.add('opening');
+    var delay = reduced ? 30 : 650;
+    setTimeout(function(){
+      scene.classList.add('scene-hide');
+      card.classList.add('card-visible');
+    }, delay);
+    setTimeout(function(){
+      scene.style.display = 'none';
+    }, delay + (reduced ? 30 : 500));
+  }
+
+  envelope.addEventListener('click', openLetter);
+  envelope.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+      e.preventDefault();
+      openLetter();
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var wrap = document.getElementById('letter-pages');
+  if(!wrap) return;
+
+  (function balanceLastPage(){
+    var pgs = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+    if(pgs.length < 2) return;
+    var lastIdx = pgs.length - 1;
+    var closing = pgs[lastIdx].querySelector('.closing');
+    if(!closing) return;
+
+    pgs.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+    var heights = pgs.map(function(p){ return p.offsetHeight; });
+    pgs.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+
+    var refHeight = Math.max.apply(null, heights.slice(0, lastIdx));
+    var lastHeight = heights[lastIdx];
+    if(lastHeight <= refHeight + 40) return;
+
+    var ps = pgs[lastIdx].querySelector('.ps');
+    var newPage = document.createElement('div');
+    newPage.className = 'page';
+    newPage.appendChild(closing);
+    if(ps) newPage.appendChild(ps);
+    wrap.appendChild(newPage);
+
+    var dotsWrap = document.querySelector('.page-dots');
+    if(dotsWrap){
+      var dot = document.createElement('span');
+      dot.className = 'dot';
+      dotsWrap.appendChild(dot);
+    }
+  })();
+
+  var pages = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+  if(pages.length <= 1) return;
+
+  pages.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+  var maxHeight = Math.max.apply(null, pages.map(function(p){ return p.offsetHeight; }));
+  pages.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+  wrap.style.minHeight = maxHeight + 'px';
+
+  var nav = document.querySelector('.page-nav');
+  var dots = nav ? Array.prototype.slice.call(nav.querySelectorAll('.dot')) : [];
+  var prevBtn = nav ? nav.querySelector('.page-prev') : null;
+  var nextBtn = nav ? nav.querySelector('.page-next') : null;
+  var current = 0;
+
+  function show(idx){
+    idx = Math.max(0, Math.min(pages.length - 1, idx));
+    if(idx === current) return;
+    pages[current].classList.remove('active');
+    pages[idx].classList.add('active');
+    if(dots[current]) dots[current].classList.remove('active');
+    if(dots[idx]) dots[idx].classList.add('active');
+    current = idx;
+    if(prevBtn) prevBtn.disabled = current === 0;
+    if(nextBtn) nextBtn.disabled = current === pages.length - 1;
+    var rect = wrap.getBoundingClientRect();
+    if(rect.top < -10){ wrap.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+
+  if(prevBtn) prevBtn.addEventListener('click', function(){ show(current - 1); });
+  if(nextBtn) nextBtn.addEventListener('click', function(){ show(current + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight') show(current + 1);
+    else if(e.key === 'ArrowLeft') show(current - 1);
+  });
+})();
+</script>
+</body>
+</html>
