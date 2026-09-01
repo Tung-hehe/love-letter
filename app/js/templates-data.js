@@ -49,4 +49,8 @@ const TEMPLATE_LIST = [
     gradient: 'linear-gradient(150deg,#ffe5ec 0%,#ffd6cc 50%,#ffe9d6 100%)', ink: '#e8637d',
     iconGradient: 'linear-gradient(135deg,#ff8fa3,#e8637d)',
     icon: '<path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3z" fill="#fff" stroke="none"/>' },
+  { id: 'kien_dinh', file: 'template_kien_dinh.html', name: 'Kiên định', mood: 'quyết tâm',
+    gradient: 'linear-gradient(160deg,#241c26 0%,#3a2d34 52%,#44322a 100%)', ink: '#bd5a2f',
+    iconGradient: 'linear-gradient(135deg,#5c4d3d,#bd5a2f)',
+    icon: '<path d="M7 21V3"/><path d="M7 4l11 3.5L7 11z"/>' },
 ];

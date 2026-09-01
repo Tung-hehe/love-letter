@@ -7,22 +7,25 @@
 <title>{{ title or "Nhớ Nhung"}}</title>
 <style>
   :root{
-    --paper: #faf6ec;
-    --stripe-red: #c1443c;
-    --stripe-blue: #2f4f7a;
-    --ink: #3a3226;
-    --ink-soft: #8a8070;
-    --stamp: #9a8f74;
-    --dusk: #7d6b95;
-    --amber: #d9a15c;
+    --paper: #f3e9db;
+    --paper-panel: #e7d9bf;
+    --stripe-red: #b06a5f;
+    --stripe-blue: #4a5a7a;
+    --ink: #4a3f38;
+    --ink-soft: #978a7a;
+    --stamp: #a89a80;
+    --accent: #8a6f9c;
+    --dusk: #62517a;
+    --amber: #d6a568;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;touch-action:manipulation;}
   body{
     position:relative;
     background:
-      radial-gradient(rgba(255,255,255,0.22) 1.2px, transparent 1.4px) 0 0/20px 20px,
-      linear-gradient(160deg, #ded2c7 0%, #c9b8bd 35%, #a89aad 68%, var(--dusk) 100%);
+      radial-gradient(rgba(255,255,255,0.13) 1.2px, transparent 1.4px) 0 0/22px 22px,
+      radial-gradient(ellipse at 50% 118%, rgba(214,165,104,0.26), transparent 55%),
+      linear-gradient(165deg, #d0c2c0 0%, #b6a3b1 32%, #8d7a9c 64%, var(--dusk) 100%);
     min-height:100vh;
     display:flex;
     align-items:center;
@@ -39,8 +42,8 @@
     position:fixed;
     width:420px; height:420px;
     border-radius:50%;
-    background: radial-gradient(circle, rgba(217,161,92,0.3), transparent 70%);
-    filter:blur(32px);
+    background: radial-gradient(circle, rgba(214,165,104,0.26), rgba(138,111,156,0.14) 45%, transparent 72%);
+    filter:blur(34px);
     animation: glow-breathe 6.5s ease-in-out infinite;
     z-index:0;
   }
@@ -54,50 +57,67 @@
     max-width:600px;
     padding:9px;
     background: repeating-linear-gradient(-45deg,
-      var(--stripe-red) 0 13px,
-      var(--paper) 13px 19px,
-      var(--stripe-blue) 19px 32px,
-      var(--paper) 32px 38px);
+      var(--stripe-red) 0 11px,
+      var(--paper) 11px 18px,
+      var(--stripe-blue) 18px 29px,
+      var(--paper) 29px 36px);
     border-radius:8px;
-    box-shadow: 0 25px 55px rgba(58,50,38,0.28);
+    box-shadow: 0 26px 58px rgba(56,44,70,0.34);
     transform: none;
     z-index:1;
   }
   .postcard{
     position:relative;
-    background: var(--paper);
+    background:
+      radial-gradient(ellipse at 30% 12%, rgba(255,251,243,0.7), transparent 60%),
+      radial-gradient(ellipse at 100% 100%, rgba(138,111,156,0.1), transparent 55%),
+      var(--paper);
     border-radius:4px;
     padding:44px 40px 38px;
     overflow:hidden;
     z-index:1;
+    box-shadow: inset 0 0 46px rgba(74,63,56,0.10);
   }
   .postmark{
     position:absolute;
-    top:20px;
-    right:22px;
-    width:64px;
-    opacity:0.75;
+    top:18px;
+    right:20px;
+    width:66px;
+    opacity:0.9;
+    transform: rotate(3.5deg);
+    filter: drop-shadow(0 3px 6px rgba(56,44,70,0.28));
   }
+  .postmark .perf{ fill: var(--paper); }
+  .postmark .stamp-paper{ fill: var(--paper-panel); }
+  .postmark .stamp-frame{ fill:none; stroke: var(--stripe-red); stroke-width:1.5; opacity:0.9; }
+  .postmark .stamp-hairline{ fill:none; stroke: var(--stripe-red); stroke-width:0.7; opacity:0.45; }
+  .postmark .art-fill{ fill: var(--stripe-blue); }
+  .postmark .stamp-label{ fill: var(--stripe-blue); font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; font-size:5px; letter-spacing:1.6px; opacity:0.66; }
+  .postmark .deno{ fill: var(--stripe-red); opacity:0.9; }
+  .postmark .cancel{ fill:none; stroke: var(--stamp); stroke-width:1.5; stroke-linecap:round; opacity:0.62; }
   .eyebrow{
     display:inline-flex;
     align-items:center;
-    gap:6px;
-    font-size:11.5px;
-    letter-spacing:0.18em;
+    gap:7px;
+    font-size:11px;
+    letter-spacing:0.24em;
     text-transform:uppercase;
-    color: var(--stripe-blue);
-    border-bottom:1px solid rgba(47,79,122,0.35);
-    padding-bottom:4px;
+    font-weight:400;
+    color: var(--accent);
+    border-bottom:1px solid rgba(138,111,156,0.32);
+    padding-bottom:5px;
     margin-bottom:22px;
-    animation: eyebrow-glow 3s ease-in-out infinite;
+    animation: eyebrow-glow 3.4s ease-in-out infinite;
   }
   @keyframes eyebrow-glow{
-    0%,100%{ opacity:0.8; }
+    0%,100%{ opacity:0.72; }
     50%{ opacity:1; }
   }
   .date{
-    font-size:12.5px;
-    letter-spacing:0.08em;
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-style:italic;
+    font-size:13.5px;
+    letter-spacing:0.05em;
     color: var(--ink-soft);
     margin-bottom:20px;
   }
@@ -105,28 +125,30 @@
     font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
     font-weight:500;
     font-style:italic;
-    font-size:clamp(26px, 5.6vw, 34px);
-    color: var(--ink);
-    margin: 0 0 24px;
-    line-height:1.35;
-    max-width:22ch;
+    font-size:clamp(27px, 5.8vw, 36px);
+    letter-spacing:-0.01em;
+    color: var(--dusk);
+    margin: 0 0 26px;
+    line-height:1.4;
+    max-width:20ch;
   }
   .body-text{
-    border-left:2px solid rgba(47,79,122,0.25);
+    border-left:2px solid rgba(138,111,156,0.3);
     padding-left:18px;
     margin:0 6px;
   }
   .body-text p{
     font-size:clamp(15.5px, 2.1vw, 16.5px);
     font-weight:400;
-    line-height:1.9;
+    line-height:1.95;
     margin: 0 0 18px;
     color: var(--ink);
+    opacity:0.92;
     max-width:46ch;
     text-align:justify;
     text-align-last:left;
   }
-  .body-text a, .ps a{ color:var(--stripe-blue); text-decoration:underline; text-underline-offset:2px; }
+  .body-text a, .ps a{ color:var(--accent); text-decoration:underline; text-underline-offset:2px; }
   .divider{
     display:flex;
     align-items:center;
@@ -143,7 +165,7 @@
     content:"";
     flex:1;
     height:1px;
-    background: rgba(138,128,112,0.35);
+    background: linear-gradient(to right, transparent, rgba(138,111,156,0.4), transparent);
   }
   .closing{
     margin-top:6px;
@@ -153,36 +175,30 @@
     align-items:center;
     gap:8px;
   }
-  .mail-icon{
-    color: var(--stripe-blue);
-    display:inline-block;
-    animation: drift-away 2.6s ease-in-out infinite;
-  }
-  @keyframes drift-away{
-    0%,100%{ transform:translate(0,0) rotate(0deg); opacity:0.8; }
-    50%{ transform:translate(4px,-3px) rotate(8deg); opacity:1; }
-  }
   .closing-text{
-    font-size:14.5px;
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-size:15px;
     font-style:italic;
-    color: var(--ink);
-    margin-bottom:6px;
+    letter-spacing:0.01em;
+    color: var(--ink-soft);
+    margin-bottom:8px;
   }
   .signature{
     font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
     font-weight:500;
     font-style:italic;
-    font-size:26px;
-    color: var(--ink);
+    font-size:27px;
+    color: var(--dusk);
     line-height:1.3;
   }
   .ps{
     margin-top:26px;
     padding-top:14px;
-    border-top:1px dashed rgba(138,128,112,0.5);
-    font-size:13.5px;
+    border-top:1px dashed rgba(138,111,156,0.45);
+    font-size:14.5px;
+    line-height:1.7;
     font-style:italic;
-    color: var(--ink);
+    color: var(--ink-soft);
   }
   .float.f1{ top:10%; left:8%; font-size:22px; }
   .float.f2{ top:18%; right:9%; font-size:18px; animation-delay:1s; }
@@ -195,14 +211,14 @@
   .float{
     position:fixed;
     color: var(--paper);
-    opacity:0.65;
+    opacity:0.55;
     animation: bob 4.5s ease-in-out infinite;
     z-index:0;
-    filter: drop-shadow(0 2px 6px rgba(58,50,38,0.4));
+    filter: drop-shadow(0 2px 6px rgba(56,44,70,0.4));
   }
   .float.f2, .float.f4, .float.f6, .float.f8{
     color: var(--amber);
-    filter: drop-shadow(0 0 8px rgba(217,161,92,0.65));
+    filter: drop-shadow(0 0 8px rgba(214,165,104,0.6));
   }
   @keyframes bob{
     0%,100%{ transform:translateY(0) rotate(0deg); }
@@ -225,9 +241,9 @@
   .page-nav .page-btn{
     width:34px; height:34px;
     border-radius:50%;
-    border:1px solid rgba(154,143,116,0.4);
-    background: rgba(154,143,116,0.1);
-    color: var(--ink);
+    border:1px solid rgba(138,111,156,0.4);
+    background: rgba(138,111,156,0.1);
+    color: var(--dusk);
     font-size:17px;
     line-height:1;
     padding:0;
@@ -244,14 +260,14 @@
   .page-dots .dot{
     width:6px; height:6px;
     border-radius:50%;
-    background: rgba(154,143,116,0.35);
+    background: rgba(138,111,156,0.35);
     transition: background 0.25s ease, transform 0.25s ease;
   }
-  .page-dots .dot.active{ background: var(--ink); transform:scale(1.35); }
+  .page-dots .dot.active{ background: var(--accent); transform:scale(1.35); }
   .fx-mote{
     position:absolute;
     border-radius:50%;
-    background: radial-gradient(circle, var(--mote-color, rgba(180,150,100,0.8)), transparent 72%);
+    background: radial-gradient(circle, var(--mote-color, rgba(170,140,170,0.75)), transparent 72%);
     filter: blur(0.5px);
     animation: mote-calm 8.5s ease-in-out infinite;
     z-index:-1;
@@ -265,7 +281,7 @@
     100%{ transform:translateY(-104px) translateX(-2px) scale(0.65); opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
-    .float, .page, .fx-mote, .card-glow, .eyebrow, .divider, .mail-icon, .seal, .postmark{ animation:none; }
+    .float, .page, .fx-mote, .card-glow, .eyebrow, .divider, .seal, .postmark{ animation:none; }
   }
   @media (max-width:480px){
     .postcard{ padding:36px 22px 30px; }
@@ -311,16 +327,16 @@
   .envelope-body{
     position:absolute;
     inset:0;
-    background:#d8cca8;
+    background:#d9cbb4;
     border-radius:6px;
-    box-shadow:0 20px 45px rgba(0,0,0,0.28);
+    box-shadow:0 20px 45px rgba(56,44,70,0.32);
     overflow:hidden;
   }
   .envelope-flap{
     position:absolute;
     top:0; left:0;
     width:100%; height:60%;
-    background:#c2b48a;
+    background:#c7b596;
     clip-path:polygon(0 0, 100% 0, 50% 100%);
     transform-origin:top center;
     transform-style:preserve-3d;
@@ -338,11 +354,11 @@
     transform:translate(-50%,-50%);
     width:54px; height:54px;
     border-radius:50%;
-    background:#a13a30;
+    background:#9c5a4f;
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#faf6ec;
+    color:#f3e9db;
     font-size:18px;
     box-shadow:0 6px 14px rgba(0,0,0,0.25);
     z-index:3;
@@ -389,9 +405,9 @@
     animation: stamp-thump 0.6s ease 0.5s 1;
   }
   @keyframes stamp-thump{
-    0%{ transform:scale(1.7) rotate(-10deg); opacity:0; }
-    60%{ transform:scale(0.92) rotate(2deg); opacity:0.9; }
-    100%{ transform:scale(1) rotate(0deg); opacity:0.75; }
+    0%{ transform:scale(1.7) rotate(-12deg); opacity:0; }
+    60%{ transform:scale(0.93) rotate(7deg); opacity:0.95; }
+    100%{ transform:scale(1) rotate(3.5deg); opacity:0.9; }
   }
   @media (prefers-reduced-motion: reduce){
     .envelope-flap{ transition:transform 0.01s linear; }
@@ -432,10 +448,35 @@
       <span class="fx-mote" style="width:4px; height:4px; left:84%; bottom:22%; animation-delay:6.6s;"></span>
       <span class="fx-mote" style="width:5px; height:5px; left:92%; bottom:54%; animation-delay:7.5s;"></span>
       <span class="fx-mote" style="width:5px; height:5px; left:12%; bottom:74%; animation-delay:8.1s;"></span>
-      <svg class="postmark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="32" cy="32" r="26" fill="none" stroke="#9a8f74" stroke-width="1.4" stroke-dasharray="3,3"/>
-        <circle cx="32" cy="32" r="18" fill="none" stroke="#9a8f74" stroke-width="1"/>
-        <path d="M14 40 L50 24 M14 46 L50 30" stroke="#9a8f74" stroke-width="1"/>
+      <svg class="postmark" viewBox="0 0 72 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g class="perf">
+          <circle cx="4" cy="4" r="2.6"/><circle cx="17" cy="4" r="2.6"/><circle cx="30" cy="4" r="2.6"/><circle cx="43" cy="4" r="2.6"/><circle cx="55" cy="4" r="2.6"/><circle cx="68" cy="4" r="2.6"/>
+          <circle cx="4" cy="80" r="2.6"/><circle cx="17" cy="80" r="2.6"/><circle cx="30" cy="80" r="2.6"/><circle cx="43" cy="80" r="2.6"/><circle cx="55" cy="80" r="2.6"/><circle cx="68" cy="80" r="2.6"/>
+          <circle cx="4" cy="17" r="2.6"/><circle cx="4" cy="30" r="2.6"/><circle cx="4" cy="42" r="2.6"/><circle cx="4" cy="55" r="2.6"/><circle cx="4" cy="68" r="2.6"/>
+          <circle cx="68" cy="17" r="2.6"/><circle cx="68" cy="30" r="2.6"/><circle cx="68" cy="42" r="2.6"/><circle cx="68" cy="55" r="2.6"/><circle cx="68" cy="68" r="2.6"/>
+        </g>
+        <rect class="stamp-paper" x="5" y="5" width="62" height="74" rx="1.5"/>
+        <rect class="stamp-frame" x="8.5" y="8.5" width="55" height="67" rx="1"/>
+        <rect class="stamp-hairline" x="11.5" y="11.5" width="49" height="61"/>
+        <circle class="art-fill" cx="11.5" cy="11.5" r="0.9"/>
+        <circle class="art-fill" cx="60.5" cy="11.5" r="0.9"/>
+        <circle class="art-fill" cx="11.5" cy="72.5" r="0.9"/>
+        <circle class="art-fill" cx="60.5" cy="72.5" r="0.9"/>
+        <circle class="art-fill" cx="34.5" cy="36.5" r="11.5"/>
+        <circle class="stamp-paper" cx="29" cy="31.5" r="10"/>
+        <path class="art-fill" d="M47.5 26 q0.6 2.9 3.2 3.5 q-2.6 0.6 -3.2 3.5 q-0.6 -2.9 -3.2 -3.5 q2.6 -0.6 3.2 -3.5 Z"/>
+        <circle class="art-fill" cx="42" cy="17.5" r="0.8"/>
+        <circle class="art-fill" cx="52" cy="44" r="0.7"/>
+        <circle class="art-fill" cx="22" cy="52" r="0.6"/>
+        <text class="stamp-label" x="36" y="65" text-anchor="middle">NHỚ NHUNG</text>
+        <path class="deno" transform="translate(51 13.5) scale(0.17)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        <g class="cancel" transform="rotate(-12 16 15)">
+          <circle cx="16" cy="15" r="8"/>
+          <circle cx="16" cy="15" r="4.6"/>
+          <path d="M8.7 12.8 q3.65 1.35 7.3 0 t7.3 0"/>
+          <path d="M8.7 15 q3.65 1.35 7.3 0 t7.3 0"/>
+          <path d="M8.7 17.2 q3.65 1.35 7.3 0 t7.3 0"/>
+        </g>
       </svg>
       <div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>{{ label or "Nhớ Nhung" }}</div>
       <div class="date">{{ date }}</div>
@@ -450,12 +491,11 @@
             {% endfor %}
           </div>
           {% if loop.last %}
-          <div class="divider">✦</div>
           <div class="closing">
+            <div class="divider">✦</div>
             <div class="closing-text">{{ closing }}</div>
             <div class="signature-wrap">
               <span class="signature">{{ sign }}</span>
-              <span class="mail-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></span>
             </div>
           </div>
           {% if postscript %}

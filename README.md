@@ -16,7 +16,8 @@ love-letter-project/
 │   ├── template_ngot_ngao.html  → Ngọt ngào — tươi trẻ, rung động vui tươi
 │   ├── template_binh_yen.html   → Bình yên — êm đềm, gắn bó lâu dài
 │   ├── template_xin_loi.html    → Xin lỗi — chân thành, làm hoà
-│   └── template_gian_doi.html   → Giận dỗi — hờn dỗi dễ thương
+│   ├── template_gian_doi.html   → Giận dỗi — hờn dỗi dễ thương
+│   └── template_kien_dinh.html  → Kiên định — vững vàng, quyết tâm, lời hứa bền gan
 ├── output/               # Thư đã render (tạo tự động)
 └── generate.py           # Script xuất thư
 ```

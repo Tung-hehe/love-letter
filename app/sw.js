@@ -1,7 +1,7 @@
 // sw.js — cache để app cài được vào màn hình chính và mở lại khi mất mạng.
 // Chiến lược network-first: luôn ưu tiên lấy bản mới nhất từ mạng khi có kết nối,
 // chỉ dùng bản cache khi mất mạng — tránh việc lỡ cache một bản cũ rồi kẹt mãi ở đó.
-const CACHE = 'thu-tay-v56';
+const CACHE = 'thu-tay-v57';
 const ASSETS = [
   '/',
   './',
@@ -21,6 +21,7 @@ const ASSETS = [
   '../templates/template_binh_yen.html',
   '../templates/template_gian_doi.html',
   '../templates/template_ngot_ngao.html',
+  '../templates/template_kien_dinh.html',
 ];
 
 self.addEventListener('install', (event) => {
