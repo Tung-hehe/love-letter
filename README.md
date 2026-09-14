@@ -17,7 +17,10 @@ love-letter-project/
 │   ├── template_binh_yen.html   → Bình yên — êm đềm, gắn bó lâu dài
 │   ├── template_xin_loi.html    → Xin lỗi — chân thành, làm hoà
 │   ├── template_gian_doi.html   → Giận dỗi — hờn dỗi dễ thương
-│   └── template_kien_dinh.html  → Kiên định — vững vàng, quyết tâm, lời hứa bền gan
+│   ├── template_tinh_ban.html   → Tình bạn — trang vở, máy bay giấy lượn theo quỹ đạo
+│   ├── template_anh_em.html     → Anh em — hai chiếc thuyền giấy bồng bềnh trên sóng lúc chiều tà
+│   ├── template_chien_huu.html  → Chiến hữu — bằng hữu trưởng thành, hai cốc bia cụng nhau
+│   └── template_gia_dinh.html   → Gia đình — mái nhà ấm, ảnh gia đình rơi nhẹ, góc khung ảnh ở thẻ thư
 ├── output/               # Thư đã render (tạo tự động)
 └── generate.py           # Script xuất thư
 ```
