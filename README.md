@@ -20,7 +20,9 @@ love-letter-project/
 │   ├── template_tinh_ban.html   → Tình bạn — trang vở, máy bay giấy lượn theo quỹ đạo
 │   ├── template_anh_em.html     → Anh em — hai chiếc thuyền giấy bồng bềnh trên sóng lúc chiều tà
 │   ├── template_chien_huu.html  → Chiến hữu — bằng hữu trưởng thành, hai cốc bia cụng nhau
-│   └── template_gia_dinh.html   → Gia đình — mái nhà ấm, ảnh gia đình rơi nhẹ, góc khung ảnh ở thẻ thư
+│   ├── template_gia_dinh.html   → Gia đình (3 người) — ảnh gia đình rơi nhẹ, watermark 2 phụ huynh + 1 con
+│   ├── template_gia_dinh_4.html → Gia đình (4 người) — giống template_gia_dinh, watermark 2 phụ huynh + 2 con
+│   └── template_gia_dinh_5.html → Gia đình (5 người) — giống template_gia_dinh, watermark 2 phụ huynh + 3 con
 ├── output/               # Thư đã render (tạo tự động)
 └── generate.py           # Script xuất thư
 ```
