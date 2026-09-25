@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/edit/:id", "destination": "/" },
+    { "source": "/edit/:id/style", "destination": "/" },
+    { "source": "/edit/:id/preview", "destination": "/" }
+  ],
+  "headers": [
+    { "source": "/sw.js", "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }] }
+  ]
+}

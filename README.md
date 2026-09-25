@@ -1,6 +1,6 @@
-# Love Letter Project ✉️
+# Thư Tay ✉️
 
-Dự án tạo thư cá nhân/tình cảm đẹp, xem tốt trên cả laptop và điện thoại.
+Dự án tạo thư tay đẹp cho nhiều dịp — tình yêu, gia đình, bạn bè... — xem tốt trên cả laptop và điện thoại.
 
 ## Cấu trúc
 
@@ -24,8 +24,55 @@ love-letter-project/
 │   ├── template_gia_dinh_4.html → Gia đình (4 người) — giống template_gia_dinh, watermark 2 phụ huynh + 2 con
 │   └── template_gia_dinh_5.html → Gia đình (5 người) — giống template_gia_dinh, watermark 2 phụ huynh + 3 con
 ├── output/               # Thư đã render (tạo tự động)
-└── generate.py           # Script xuất thư
+├── generate.py           # Script xuất thư
+└── web/                  # App soạn thư (Astro + TypeScript), deploy qua Vercel
+    ├── src/pages/index.astro       # Trang duy nhất, ráp layout + các màn hình
+    ├── src/components/             # 1 component .astro / màn hình (Thư viện, Phong
+    │                                  cách thư, Soạn thư, Xem thư, xem trước trực tiếp...)
+    ├── src/scripts/app.ts          # Toàn bộ logic: điều hướng, localStorage, form
+    ├── src/lib/                    # tiny-jinja.ts (dựng template) + render.ts
+    ├── src/data/templates.ts       # Danh sách phong cách + nội dung mẫu xem trước
+    ├── scripts/sync-templates.mjs  # Copy templates/ (ở trên) -> web/public/templates
+    │                                  trước mỗi lần dev/build — xem mục dưới
+    └── public/                     # manifest.json, sw.js, icons/ (static, giữ nguyên path)
 ```
+
+**`web/` lấy `templates/*.html` từ đâu?** Không có bản sao riêng nào được commit —
+`scripts/sync-templates.mjs` tự copy nguyên `templates/` (ở gốc repo) sang
+`web/public/templates` mỗi khi chạy `npm run dev`/`npm run build` (xem
+`predev`/`prebuild` trong `web/package.json`). Sửa gì trong `templates/` cũng chỉ
+cần sửa ở một chỗ duy nhất — cả `generate.py` (Python) lẫn app web đều đọc thẳng từ
+đó, không bao giờ lệch nhau.
+
+### Chạy app web lúc dev
+
+```bash
+cd web
+npm install
+npm run dev        # http://localhost:4321, có hot-reload
+```
+
+Build thử bản production trước khi deploy:
+
+```bash
+npm run build && npm run preview
+```
+
+### Deploy lên Vercel
+
+Project Vercel đã kết nối sẵn với repo này — chỉ cần đổi 1 setting vì `web/` không
+còn nằm ở gốc repo:
+
+1. Vercel Dashboard → project → **Settings → General → Root Directory** → đặt
+   thành `web` → Save.
+2. Framework Preset tự nhận diện **Astro** khi thấy `web/package.json` (nếu không,
+   chọn tay).
+3. Push code lên nhánh đã kết nối là Vercel tự build & deploy (hoặc bấm
+   **Deployments → ⋯ → Redeploy**).
+
+`web/vercel.json` xử lý phần rewrite cho các route `/edit/:id...` (do
+`app.ts` tự điều hướng bằng `history.pushState`, không phải trang thật nên cần
+rewrite về `index.html` để không bị 404 khi F5/mở link trực tiếp).
 
 ## Hiệu ứng mở thư
 

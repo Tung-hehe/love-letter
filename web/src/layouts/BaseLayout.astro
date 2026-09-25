@@ -1,0 +1,234 @@
+---
+export interface Props {
+  title?: string;
+}
+const { title = 'Thư Tay' } = Astro.props;
+---
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<script is:inline>
+  try {
+    var savedTheme = localStorage.getItem('thu-tay-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (e) {}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+<meta name="theme-color" content="#B07680" />
+<meta name="color-scheme" content="light dark" />
+<title>{title}</title>
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/icons/icon.svg" />
+<style is:global>
+  :root{
+    --paper: #FDFBF8;
+    --paper-raised: #FFFFFF;
+    --ink: #4A3F3D;
+    --ink-soft: #8B7D7A;
+    --ink-faint: #BFB3AF;
+    --accent: #C08A93;
+    --accent-fill: #B07680;
+    --accent-soft: #EDD2D6;
+    --accent-bg: #FAF0F1;
+    --gold: #C9A876;
+    --gold-bg: #F7EFDF;
+    --preview-bg: #F6F0EB;
+    --border: rgba(74,63,61,0.10);
+    --border-strong: rgba(74,63,61,0.18);
+    --shadow: rgba(74,63,61,0.10);
+    --danger: #C06B5E;
+    --danger-bg: #FAEAE6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper: #221D1F;
+      --paper-raised: #2C2628;
+      --ink: #F3ECE9;
+      --ink-soft: #CDBEBB;
+      --ink-faint: #8F817E;
+      --accent: #E3B0B8;
+      --accent-fill: #CC8C96;
+      --accent-soft: #6B4C51;
+      --accent-bg: rgba(227,176,184,0.13);
+      --gold: #DEC08A;
+      --gold-bg: rgba(222,192,138,0.13);
+      --preview-bg: #262023;
+      --border: rgba(243,236,233,0.11);
+      --border-strong: rgba(243,236,233,0.20);
+      --shadow: rgba(0,0,0,0.45);
+      --danger: #DE9186;
+      --danger-bg: rgba(222,145,134,0.13);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #221D1F; --paper-raised: #2C2628; --ink: #F3ECE9; --ink-soft: #CDBEBB;
+    --ink-faint: #8F817E; --accent: #E3B0B8; --accent-fill: #CC8C96; --accent-soft: #6B4C51;
+    --accent-bg: rgba(227,176,184,0.13); --gold: #DEC08A; --gold-bg: rgba(222,192,138,0.13);
+    --preview-bg: #262023;
+    --border: rgba(243,236,233,0.11); --border-strong: rgba(243,236,233,0.20); --shadow: rgba(0,0,0,0.45);
+    --danger: #DE9186; --danger-bg: rgba(222,145,134,0.13);
+  }
+  :root[data-theme="light"]{
+    --paper: #FDFBF8; --paper-raised: #FFFFFF; --ink: #4A3F3D; --ink-soft: #8B7D7A;
+    --ink-faint: #BFB3AF; --accent: #C08A93; --accent-fill: #B07680; --accent-soft: #EDD2D6;
+    --accent-bg: #FAF0F1; --gold: #C9A876; --gold-bg: #F7EFDF;
+    --preview-bg: #F6F0EB;
+    --border: rgba(74,63,61,0.10); --border-strong: rgba(74,63,61,0.18); --shadow: rgba(74,63,61,0.10);
+    --danger: #C06B5E; --danger-bg: #FAEAE6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+
+  .screen{display:none;min-height:100vh;flex-direction:column;background:var(--paper);}
+  .screen.active{display:flex;animation:screen-in 0.28s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes screen-in{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .screen.active{animation:none;}
+  }
+  .primary-btn, .secondary-btn, .new-letter-btn, .letter-card-open, .theme-card, .icon-btn, .topbar-primary-btn{
+    transition:transform 0.12s ease;
+  }
+  .primary-btn:active, .secondary-btn:active, .new-letter-btn:active, .letter-card-open:active,
+  .theme-card:active, .icon-btn:active, .topbar-primary-btn:active{
+    transform:scale(0.96);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .primary-btn, .secondary-btn, .new-letter-btn, .letter-card-open, .theme-card, .icon-btn, .topbar-primary-btn{ transition:none; }
+    .primary-btn:active, .secondary-btn:active, .new-letter-btn:active, .letter-card-open:active,
+    .theme-card:active, .icon-btn:active, .topbar-primary-btn:active{ transform:none; }
+  }
+
+  .topbar{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 16px calc(10px + env(safe-area-inset-top));
+    border-bottom:0.5px solid var(--border);
+    position:sticky;top:0;background:var(--paper);z-index:5;
+  }
+  .topbar h2{
+    font-family:inherit;
+    font-weight:700;font-size:17px;margin:0;color:var(--ink);flex:1;
+  }
+  .icon-btn{
+    width:34px;height:34px;border-radius:50%;border:0.5px solid var(--border);
+    background:var(--paper-raised);color:var(--ink-soft);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn svg{width:16px;height:16px;}
+
+  .screen-body{max-width:520px;margin:0 auto;width:100%;padding:16px 18px 24px;flex:1;}
+  h1{
+    font-family:inherit;
+    font-weight:700;font-size:26px;margin:0 0 4px;color:var(--ink);
+  }
+  .subtitle{font-size:14px;color:var(--ink-soft);margin:0 0 16px;line-height:1.55;}
+
+  .primary-btn{
+    width:100%;background:var(--accent-fill);color:#fff;border:none;
+    border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit;
+    box-shadow:0 10px 22px var(--shadow);
+  }
+  .primary-btn:disabled{opacity:0.6;}
+  .secondary-btn{
+    width:100%;background:var(--paper-raised);color:var(--ink-soft);
+    border:0.5px solid var(--border-strong);border-radius:12px;padding:14px;
+    font-size:14.5px;font-weight:500;font-family:inherit;
+  }
+
+  /* Nút hành động chính gọn trong thanh trên cùng — dùng trên máy tính đủ rộng
+     (>=1040px) thay cho thanh cố định ở đáy màn, xem StylePickerScreen.astro /
+     ComposeScreen.astro. Ẩn mặc định, chỉ hiện qua media query ở 2 file đó. */
+  .topbar-primary-btn{
+    display:none;flex-shrink:0;
+    background:var(--accent-fill);color:#fff;border:none;
+    border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600;font-family:inherit;
+    box-shadow:0 4px 10px var(--shadow);
+  }
+
+  .field label{
+    display:block;font-size:11px;font-weight:500;letter-spacing:0.04em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  input[type="text"], textarea{
+    width:100%;background:var(--paper-raised);border:0.5px solid var(--border);
+    border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;color:var(--ink);
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg);
+  }
+  textarea{resize:vertical;line-height:1.5;}
+  .hint{font-size:12px;color:var(--ink-faint);margin-top:5px;}
+
+  .field.has-error label{color:var(--danger);}
+  .field.has-error input[type="text"], .field.has-error textarea{
+    border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-bg);
+  }
+  .field-error-msg{font-size:12px;color:var(--danger);margin:6px 0 0;}
+
+  @media (max-width:380px){
+    .row2{grid-template-columns:1fr;}
+  }
+
+  /* --- Laptop/desktop: danh sách thư (thu gọn) luôn hiện bên trái, nội dung
+     thao tác bên phải --- */
+  @media (min-width:860px){
+    body{padding:0;}
+    .screen-stack{
+      display:grid;
+      grid-template-columns:240px 1fr;
+      width:100%;height:100vh;
+    }
+    #screen-home{
+      display:flex !important;
+      animation:none;
+      grid-column:1;
+      position:relative;
+      min-height:0;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      border-right:0.5px solid var(--border);
+    }
+    #screen-picker, #screen-compose, #screen-letter-preview, #screen-detail-empty{
+      grid-column:2;
+      min-height:0;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      background:var(--paper-raised);
+      animation:none;
+    }
+    #screen-detail-empty{display:none;}
+    .screen-stack.show-detail-empty #screen-detail-empty{
+      display:flex;
+    }
+  }
+
+  /* Phong cách thư / Soạn thư: chia đôi đều với phần xem trước, chỉ khi đủ rộng
+     cho cả 2 nửa (< ngưỡng này, chúng chiếm trọn cột 2 như bình thường). */
+  @media (min-width:1040px){
+    .screen-stack.show-live-preview{
+      grid-template-columns:240px 1fr 1fr;
+    }
+    .screen-stack.show-live-preview .live-preview-pane{
+      display:flex;
+      grid-column:3;
+      min-height:0;
+      border-left:0.5px solid var(--border);
+    }
+  }
+</style>
+</head>
+<body>
+  <slot />
+</body>
+</html>

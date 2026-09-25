@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LibraryScreen from '../components/LibraryScreen.astro';
+import StylePickerScreen from '../components/StylePickerScreen.astro';
+import ComposeScreen from '../components/ComposeScreen.astro';
+import LetterPreviewScreen from '../components/LetterPreviewScreen.astro';
+import DetailEmptyScreen from '../components/DetailEmptyScreen.astro';
+import LivePreviewPane from '../components/LivePreviewPane.astro';
+---
+<BaseLayout title="Thư Tay">
+  <div class="screen-stack">
+    <LibraryScreen />
+    <StylePickerScreen />
+    <ComposeScreen />
+    <LetterPreviewScreen />
+    <DetailEmptyScreen />
+    <LivePreviewPane />
+  </div>
+  <script src="../scripts/app.ts"></script>
+</BaseLayout>

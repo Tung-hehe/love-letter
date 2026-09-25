@@ -1,7 +1,7 @@
 {
-  "name": "Love letter",
-  "short_name": "Love letter",
-  "description": "Soạn thư tình",
+  "name": "Thư Tay",
+  "short_name": "Thư Tay",
+  "description": "Soạn thư tay cho mọi dịp — tình yêu, gia đình, bạn bè",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

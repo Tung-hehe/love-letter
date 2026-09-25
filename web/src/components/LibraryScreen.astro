@@ -1,0 +1,93 @@
+---
+// Màn 1: Thư viện. Danh sách thư (#letter-list) được app.ts render động bằng
+// innerHTML — Astro chỉ scope được CSS cho markup nó tự build lúc build time, nên
+// style ở đây dùng is:global để áp dụng đúng cho cả phần DOM sinh ra lúc runtime.
+---
+<section id="screen-home" class="screen active">
+  <div class="app-header">
+    <div class="app-header-row">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </span>
+        <h1>Thư viện</h1>
+      </div>
+      <button type="button" id="theme-toggle" class="icon-btn" aria-label="Đổi giao diện sáng/tối"></button>
+    </div>
+    <button type="button" id="fab-new" class="new-letter-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Viết thư mới</span>
+    </button>
+  </div>
+  <div class="screen-body">
+    <p id="home-subtitle" class="subtitle"></p>
+    <div id="letter-list" class="letter-list"></div>
+    <div id="home-empty" class="empty-state" hidden>
+      <p>Chưa có lá thư nào.</p>
+      <p class="empty-hint">Viết lá thư đầu tiên của bạn.</p>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  #screen-home .app-header{padding:22px 18px 16px;max-width:520px;margin:0 auto;width:100%;}
+  .app-header-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  .brand h1{margin:0;}
+  .brand-mark{
+    flex-shrink:0;width:30px;height:30px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--gold));
+    box-shadow:0 3px 8px var(--shadow);
+  }
+  .brand-mark svg{width:15px;height:15px;}
+  #theme-toggle svg{width:16px;height:16px;}
+  .letter-list{display:flex;flex-direction:column;gap:8px;}
+  .letter-card{
+    display:flex;align-items:center;gap:2px;width:100%;
+    padding:4px 4px 4px 10px;background:var(--paper-raised);
+    border:0.5px solid var(--border);border-radius:13px;
+  }
+  .letter-card-open{
+    display:flex;align-items:center;gap:10px;flex:1;min-width:0;
+    text-align:left;background:none;border:none;padding:6px 0;font-family:inherit;color:inherit;
+  }
+  .lc-icon{
+    width:32px;height:32px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 8px var(--shadow);
+  }
+  .lc-icon svg{width:13px;height:13px;fill:#fff;opacity:0.92;}
+  .lc-text{min-width:0;}
+  .lc-title{font-size:13px;font-weight:500;margin:0 0 2px;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lc-meta{font-size:11px;color:var(--ink-faint);margin:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lc-chev{margin-left:auto;color:var(--ink-faint);flex-shrink:0;}
+  .lc-chev svg{width:13px;height:13px;}
+  .letter-card-delete{
+    flex-shrink:0;width:30px;height:30px;border-radius:50%;border:none;
+    background:none;color:var(--ink-faint);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .letter-card-delete svg{width:15px;height:15px;}
+  .letter-card-delete:active{background:var(--danger-bg);color:var(--danger);}
+  .empty-state{text-align:center;padding:48px 16px;color:var(--ink-soft);}
+  .empty-state p{margin:0 0 4px;font-size:13.5px;}
+  .empty-state .empty-hint{color:var(--ink-faint);font-size:12px;}
+  .new-letter-btn{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    width:100%;background:var(--accent-fill);color:#fff;border:none;
+    border-radius:11px;padding:11px;font-size:13.5px;font-weight:500;font-family:inherit;
+    box-shadow:0 8px 18px var(--shadow);margin-top:14px;
+  }
+  .new-letter-btn svg{width:15px;height:15px;}
+
+  /* Sidebar thu gọn trên máy tính (240px, xem BaseLayout) — chữ/khoảng cách nhỏ
+     lại một chút cho vừa, không cần cuộn ngang. */
+  @media (min-width:860px){
+    #screen-home .app-header{padding:18px 14px 14px;}
+    #screen-home .screen-body{padding:0 14px 20px;}
+    #screen-home h1{font-size:22px;}
+  }
+</style>

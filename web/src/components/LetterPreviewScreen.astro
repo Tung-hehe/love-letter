@@ -1,0 +1,38 @@
+---
+// Màn 4: Xem thư — bản render đầy đủ trong iframe sau khi bấm "Xem thư".
+---
+<section id="screen-letter-preview" class="screen">
+  <div class="topbar">
+    <button type="button" id="letterpreview-back" class="icon-btn" aria-label="Quay lại">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <h2 id="preview-title">Xem thư</h2>
+  </div>
+  <iframe id="preview-frame" title="Xem thư"></iframe>
+  <div class="bottom-bar" id="preview-bottom-bar">
+    <div class="bottom-bar-inner">
+      <button type="button" id="download-btn" class="secondary-btn">Tải file thư (.html)</button>
+      <div class="bottom-bar-row">
+        <button type="button" id="save-draft-btn" class="secondary-btn">Lưu nháp</button>
+        <button type="button" id="share-btn" class="primary-btn">Chia sẻ</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #preview-frame{flex:1;width:100%;border:none;background:#fff;}
+  .bottom-bar{
+    display:flex;flex-direction:column;gap:8px;
+    padding:12px 16px calc(14px + env(safe-area-inset-bottom));
+    border-top:0.5px solid var(--border);background:var(--paper);
+  }
+  /* .bottom-bar{display:flex} và thuộc tính [hidden] mặc định của trình duyệt có
+     cùng độ đặc hiệu (1 class = 1 attribute) — rule của UA đứng trước nên bị rule
+     này (đứng sau trong cùng stylesheet) đè mất display:none. Ghi đè lại tường
+     minh để app.ts ẩn được bằng el.hidden = true (dùng khi "Xem mẫu" từ picker). */
+  .bottom-bar[hidden]{display:none;}
+  .bottom-bar-inner{max-width:520px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:8px;}
+  .bottom-bar-row{display:flex;gap:10px;}
+  .bottom-bar-row > *, #download-btn{flex:1;margin:0;box-shadow:none;}
+</style>

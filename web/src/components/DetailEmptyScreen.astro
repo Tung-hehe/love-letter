@@ -1,0 +1,33 @@
+---
+// Chỉ hiện trên laptop (xem CSS desktop trong BaseLayout) khi chưa chọn thư/thao
+// tác nào bên phải. Markup hoàn toàn tĩnh nên style ở đây được Astro scope bình
+// thường (không cần is:global).
+---
+<section id="screen-detail-empty" class="screen detail-empty">
+  <div class="detail-empty-inner">
+    <span class="detail-empty-icon">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </span>
+    <h2>Chọn một lá thư để xem</h2>
+    <p>Hoặc bấm "Viết thư mới" ở bên trái để bắt đầu một lá thư khác.</p>
+  </div>
+</section>
+
+<style>
+  .detail-empty{align-items:center;justify-content:center;}
+  .detail-empty-inner{
+    max-width:280px;text-align:center;padding:24px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  .detail-empty-icon{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--accent-bg);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .detail-empty-icon svg{width:24px;height:24px;}
+  .detail-empty h2{
+    font-family:inherit;
+    font-weight:700;font-size:18px;margin:0;color:var(--ink);
+  }
+  .detail-empty p{font-size:13.5px;color:var(--ink-soft);margin:0;line-height:1.6;}
+</style>

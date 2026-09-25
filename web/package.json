@@ -1,0 +1,22 @@
+{
+  "name": "thu-tay-web",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "sync-templates": "node scripts/sync-templates.mjs",
+    "predev": "npm run sync-templates",
+    "dev": "astro dev",
+    "prebuild": "npm run sync-templates",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.3.5",
+    "@astrojs/vercel": "^11.0.11"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

@@ -222,3 +222,14 @@ __marimo__/
 .claude/
 output/
 local/
+
+# web/ (app Astro) — build output + dependency cài lại được, templates đồng bộ
+# tự động từ templates/ ở root (xem web/scripts/sync-templates.mjs)
+web/node_modules/
+web/dist/
+web/.astro/
+web/.vercel/
+web/public/templates/
+# rule "lib/" phía trên (dành cho Python) vô tình khớp luôn web/src/lib/ vì
+# gitignore match theo tên thư mục ở mọi cấp — mở lại riêng cho thư mục này.
+!web/src/lib/

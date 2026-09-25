@@ -1,0 +1,155 @@
+---
+// Màn 3: Soạn thư. #para-list được app.ts render động (đoạn văn + nút ngắt trang)
+// -> style is:global, xem ghi chú trong LibraryScreen.astro.
+//
+// Vị trí nút hành động đổi theo ngưỡng 1040px (khớp lúc xem trước bên phải xuất
+// hiện, xem BaseLayout):
+// - <1040px (chưa có xem trước bên phải): 1 nút "Xem thư" ở thanh dưới cùng ->
+//   chuyển sang màn xem trước toàn màn hình riêng (LetterPreviewScreen.astro)
+//   rồi mới tải/chia sẻ/lưu ở đó.
+// - >=1040px (đã xem trực tiếp bên phải rồi, không cần màn xem thư riêng nữa):
+//   4 icon Tải lại xem trước/Tải/Lưu/Chia sẻ gọn ngay trong thanh trên cùng,
+//   thanh dưới cùng ẩn hẳn.
+//
+// Không tự lưu khi gõ nữa — chỉ nút Lưu (đĩa mềm) mới thật sự ghi vào thư viện,
+// xem saveCurrentLetter() trong app.ts. Khung xem trước bên phải cũng không tự
+// render lại khi gõ nữa — nút "Tải lại xem trước" (đầu nhóm icon) mới cập nhật.
+---
+<section id="screen-compose" class="screen">
+  <div class="topbar">
+    <button type="button" id="compose-back" class="icon-btn" aria-label="Quay lại">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <h2>Soạn thư</h2>
+    <button type="button" id="compose-style-btn" class="icon-btn" aria-label="Đổi phong cách thư" title="Đổi phong cách thư">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11l-3-3M4 7l3 3"/><path d="M20 17H9l3 3M20 17l-3-3"/></svg>
+    </button>
+    <div class="topbar-compose-actions">
+      <button type="button" id="live-preview-reload" class="icon-btn" aria-label="Tải lại xem trước" title="Tải lại xem trước">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.36L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.36L3 16"/><path d="M3 21v-5h5"/></svg>
+      </button>
+      <button type="button" id="compose-download-btn" class="icon-btn" aria-label="Tải file thư (.html)" title="Tải file thư (.html)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
+      </button>
+      <button type="button" id="compose-save-btn" class="icon-btn" aria-label="Lưu nháp" title="Lưu nháp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5V4z"/><path d="M8 4v5h7V4"/><path d="M8 13h8v6H8z"/></svg>
+      </button>
+      <button type="button" id="compose-share-btn" class="icon-btn compose-share-btn" aria-label="Chia sẻ" title="Chia sẻ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.5 15.7 6.6M8.3 13.5 15.7 17.4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="screen-body">
+    <form id="letter-form">
+      <div class="field">
+        <label for="f-title">Tiêu đề</label>
+        <input type="text" id="f-title" name="title" />
+      </div>
+
+      <div class="field">
+        <label for="f-date">Ngày</label>
+        <input type="text" id="f-date" name="date" placeholder="20 tháng 7, 2026" />
+      </div>
+
+      <div class="field">
+        <label for="f-greeting">Lời chào</label>
+        <input type="text" id="f-greeting" name="greeting" />
+      </div>
+
+      <div class="field">
+        <label for="f-label">Nhãn nhỏ (không bắt buộc)</label>
+        <input type="text" id="f-label" name="label" placeholder="Để trống sẽ dùng nhãn mặc định của phong cách" />
+      </div>
+
+      <div class="field content-field">
+        <label>Nội dung</label>
+        <div id="para-list"></div>
+        <button type="button" id="add-para" class="add-para">+ Thêm đoạn văn</button>
+        <p class="hint">Bấm "+ Ngắt trang" giữa hai đoạn để tự chọn đoạn nào sang trang mới khi xem.</p>
+      </div>
+
+      <div class="field">
+        <label for="f-closing">Lời kết</label>
+        <input type="text" id="f-closing" name="closing" />
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="f-sign">Chữ ký</label>
+          <input type="text" id="f-sign" name="sign" />
+        </div>
+        <div class="field">
+          <label for="f-postscript">Tái bút</label>
+          <input type="text" id="f-postscript" name="postscript" placeholder="P.S. ..." />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="compose-actions">
+    <div class="compose-actions-inner">
+      <button type="button" id="preview-btn" class="primary-btn">Xem thư</button>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  #letter-form{display:flex;flex-direction:column;gap:16px;}
+
+  /* Gom phần nội dung (đoạn văn) vào 1 khối riêng, tách bạch với các trường ngắn
+     khác — đây là phần dài nhất và quan trọng nhất của lá thư nên cần nổi bật
+     hơn khi lướt qua form. */
+  .content-field{
+    background:var(--paper);border:0.5px solid var(--border);border-radius:14px;
+    padding:14px 14px 12px;
+  }
+  .content-field > label{padding-left:2px;}
+
+  .para-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+  .para-input-wrap{flex:1;min-width:0;}
+  .para-count{font-size:11px;color:var(--ink-faint);margin:4px 2px 0;text-align:right;}
+  .para-count.warn{color:var(--gold);}
+  .para-remove{
+    flex-shrink:0;width:36px;height:36px;border-radius:10px;margin-top:1px;
+    border:0.5px solid var(--border);background:var(--paper-raised);
+    color:var(--ink-faint);display:flex;align-items:center;justify-content:center;
+  }
+  .para-remove svg{width:15px;height:15px;}
+  .para-break{display:flex;align-items:center;gap:8px;margin:2px 0 8px;}
+  .para-break-line{flex:1;height:0;border-top:1px dashed var(--border-strong);}
+  .para-break-toggle{
+    flex-shrink:0;font-size:11px;font-weight:500;color:var(--ink-faint);
+    background:var(--paper-raised);border:0.5px solid var(--border);border-radius:999px;
+    padding:5px 11px;font-family:inherit;
+  }
+  .para-break.is-active .para-break-line{border-top-color:var(--accent);}
+  .para-break.is-active .para-break-toggle{color:#fff;background:var(--accent);border-color:var(--accent);}
+  .add-para{
+    width:100%;font-size:13.5px;font-weight:500;color:var(--accent);
+    border:1px dashed var(--border-strong);background:transparent;
+    border-radius:11px;padding:11px;font-family:inherit;
+  }
+  /* Thanh hành động dưới cùng — luôn bấm được ngay, không phải cuộn hết form
+     dài mới thấy. Chỉ dùng trên di động/tablet dọc, xem ghi chú đầu file. */
+  .compose-actions{
+    flex-shrink:0;position:sticky;bottom:0;
+    padding:12px 18px calc(14px + env(safe-area-inset-bottom));
+    border-top:0.5px solid var(--border);background:var(--paper);
+  }
+  .compose-actions-inner{max-width:520px;margin:0 auto;width:100%;}
+
+  /* Nhóm nút Tải/Lưu/Chia sẻ gọn trong thanh trên cùng — chỉ hiện từ ngưỡng có
+     xem trước trực tiếp bên phải (xem ghi chú đầu file). */
+  .topbar-compose-actions{display:none;align-items:center;gap:6px;flex-shrink:0;}
+
+  /* Chia sẻ là hành động chính của nhóm nên tô đậm màu accent, khác với 2 icon
+     Tải/Lưu (phụ) — vẫn dùng chung khung tròn .icon-btn (BaseLayout). */
+  .compose-share-btn{
+    background:var(--accent-fill);border-color:var(--accent-fill);color:#fff;
+    box-shadow:0 4px 10px var(--shadow);
+  }
+
+  @media (min-width:1040px){
+    .compose-actions{display:none;}
+    .topbar-compose-actions{display:flex;}
+  }
+</style>
