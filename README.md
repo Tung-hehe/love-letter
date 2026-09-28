@@ -11,18 +11,23 @@ love-letter-project/
 ├── templates/           # Các mẫu giao diện thư (file .html)
 │   ├── template_am_ap.html      → Ấm áp — tình cảm gần gũi, ấm cúng
 │   ├── template_nong_nan.html   → Nồng nàn — tình yêu say đắm, cháy bỏng
+│   ├── template_to_tinh.html    → Tỏ tình — rung động, ngỏ lời
 │   ├── template_nho_nhung.html  → Nhớ nhung — khắc khoải, tình yêu xa cách
 │   ├── template_dem_nho.html    → Đêm nhớ — trời đêm sao trăng, nỗi nhớ xa xăm
-│   ├── template_ngot_ngao.html  → Ngọt ngào — tươi trẻ, rung động vui tươi
-│   ├── template_binh_yen.html   → Bình yên — êm đềm, gắn bó lâu dài
+│   ├── template_ngay_nho.html   → Ngày nhớ — bâng khuâng giữa ban ngày
+│   ├── template_mua_nho.html    → Mưa nhớ — man mác theo cơn mưa
 │   ├── template_xin_loi.html    → Xin lỗi — chân thành, làm hoà
+│   ├── template_binh_yen.html   → Bình yên — êm đềm, gắn bó lâu dài
 │   ├── template_gian_doi.html   → Giận dỗi — hờn dỗi dễ thương
+│   ├── template_ngot_ngao.html  → Ngọt ngào — tươi trẻ, rung động vui tươi
 │   ├── template_tinh_ban.html   → Tình bạn — trang vở, máy bay giấy lượn theo quỹ đạo
 │   ├── template_anh_em.html     → Anh em — hai chiếc thuyền giấy bồng bềnh trên sóng lúc chiều tà
 │   ├── template_chien_huu.html  → Chiến hữu — bằng hữu trưởng thành, hai cốc bia cụng nhau
 │   ├── template_gia_dinh.html   → Gia đình (3 người) — ảnh gia đình rơi nhẹ, watermark 2 phụ huynh + 1 con
 │   ├── template_gia_dinh_4.html → Gia đình (4 người) — giống template_gia_dinh, watermark 2 phụ huynh + 2 con
-│   └── template_gia_dinh_5.html → Gia đình (5 người) — giống template_gia_dinh, watermark 2 phụ huynh + 3 con
+│   ├── template_gia_dinh_5.html → Gia đình (5 người) — giống template_gia_dinh, watermark 2 phụ huynh + 3 con
+│   ├── template_chia_tay.html   → Chia tay — tiếc nuối, hoàng hôn dịu dàng buông tay
+│   └── template_chuc_mung.html  → Chúc mừng — rộn ràng, hộp quà + sắc màu
 ├── output/               # Thư đã render (tạo tự động)
 ├── generate.py           # Script xuất thư
 └── web/                  # App soạn thư (Astro + TypeScript), deploy qua Vercel

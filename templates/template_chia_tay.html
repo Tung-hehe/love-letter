@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<title>{{ title or "Lời Chia Tay"}}</title>
+<style>
+  :root{
+    --dusk: #8f8fb8;
+    --dusk-deep: #565a84;
+    --sticky: #faf6f0;
+    --page: #d7c9d6;
+    --ink: #423f5c;
+    --ink-soft: #8f89a8;
+    --glow: #d99a5b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;touch-action:manipulation;}
+  body{
+    position:relative;
+    background: linear-gradient(165deg, #f0cf9e 0%, #c3a8b0 45%, #8f8fb8 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    text-rendering:optimizeLegibility;
+  }
+  .note{
+    position:relative;
+    width:100%;
+    max-width:600px;
+    background: var(--sticky);
+    border-radius:2px 22px 2px 22px;
+    box-shadow: 0 18px 40px rgba(86,90,132,0.3);
+    padding:44px 44px 42px;
+    overflow:hidden;
+    z-index:1;
+  }
+  .note::after{
+    content:"";
+    position:absolute;
+    bottom:0; right:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:0 0 28px 28px;
+    border-color: transparent transparent var(--page) transparent;
+    filter: drop-shadow(-2px -2px 3px rgba(66,63,92,0.18));
+  }
+  /* Dải hoàng hôn ở đầu thư: mặt trời khuất dần sau đường chân trời, vài cánh
+     chim bay xa dần — ẩn dụ cho một điều đang nhẹ nhàng khép lại. */
+  .wm-horizon{
+    display:block;
+    width:calc(100% + 84px);
+    height:118px;
+    margin:0 -42px 8px;
+  }
+  .wm-horizon .sun{ animation: sun-glow 4s ease-in-out infinite; }
+  @keyframes sun-glow{ 0%,100%{ opacity:0.82; } 50%{ opacity:1; } }
+  .wm-horizon .bird{ animation: bird-fly 6.5s ease-in-out infinite; }
+  .wm-horizon .bird-2{ animation-delay:1.3s; }
+  .wm-horizon .bird-3{ animation-delay:2.6s; }
+  @keyframes bird-fly{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(16px,-5px); }
+  }
+  .eyebrow-wrap{ display:flex; justify-content:center; margin-bottom:14px; }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 18px;
+    background: rgba(86,90,132,0.12);
+    border:1px solid rgba(86,90,132,0.32);
+    border-radius:999px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color: var(--dusk-deep);
+  }
+  .status{
+    display:flex;
+    justify-content:center;
+    margin-bottom:5px;
+  }
+  .status span{
+    color: var(--ink-soft);
+    font-size:13px;
+    padding:4px 13px;
+    border-radius:999px;
+    letter-spacing:0.02em;
+  }
+  .greeting{
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(28px, 6.2vw, 38px);
+    color: var(--dusk-deep);
+    text-align:center;
+    margin: 0 0 20px;
+    line-height:1.3;
+  }
+  .divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:0 auto 22px;
+    color: var(--glow);
+  }
+  .divider .line{
+    width:36px; height:1.5px;
+    background: var(--glow);
+    border-radius:3px;
+    opacity:0.6;
+  }
+  .body-text{
+    border-left:2px solid rgba(86,90,132,0.3);
+    padding-left:18px;
+    margin:0 6px;
+  }
+  .body-text p{
+    font-size:clamp(15.5px, 2.1vw, 17px);
+    font-weight:400;
+    line-height:1.9;
+    margin:0 0 18px;
+    color: var(--ink);
+    text-align:justify;
+    text-align-last:left;
+  }
+  .body-text a, .ps a{ color:var(--dusk-deep); text-decoration:underline; text-underline-offset:2px; }
+  .body-text p:last-child{ margin-bottom:0; }
+  .closing{
+    text-align:center;
+    margin-top:28px;
+  }
+  .closing-text{
+    font-size:14.5px;
+    color: var(--ink);
+    margin-bottom:6px;
+  }
+  .signature{
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:25px;
+    color: var(--dusk-deep);
+    line-height:1.3;
+  }
+  .mark{
+    margin-top:10px;
+    color: var(--glow);
+    display:inline-flex;
+    animation: mark-drift 3.4s ease-in-out infinite;
+  }
+  @keyframes mark-drift{
+    0%,100%{ transform:translateX(0); opacity:0.9; }
+    50%{ transform:translateX(6px); opacity:0.6; }
+  }
+  .ps{
+    margin-top:24px;
+    text-align:center;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:400;
+    font-style:italic;
+    font-size:15px;
+    color: var(--ink);
+  }
+  .float.f1{ top:12%; left:8%; font-size:22px; }
+  .float.f2{ top:20%; right:9%; font-size:17px; animation-delay:1s; }
+  .float.f3{ bottom:16%; left:10%; font-size:19px; animation-delay:2s; }
+  .float.f4{ bottom:22%; right:7%; font-size:18px; animation-delay:0.5s; }
+  .float.f5{ top:7%; left:38%; font-size:16px; animation-delay:1.6s; }
+  .float.f6{ top:9%; right:36%; font-size:20px; animation-delay:2.4s; }
+  .float.f7{ bottom:7%; left:41%; font-size:17px; animation-delay:0.8s; }
+  .float.f8{ bottom:10%; right:39%; font-size:14px; animation-delay:3s; }
+  .float{
+    position:fixed;
+    color: #fff;
+    opacity:0.8;
+    animation: drift 5.5s ease-in-out infinite;
+    z-index:0;
+    filter: drop-shadow(0 3px 10px rgba(66,63,92,0.4));
+  }
+  .float.f2, .float.f4, .float.f6, .float.f8{
+    color: var(--glow);
+    filter: drop-shadow(0 0 10px rgba(217,154,91,0.85));
+  }
+  @keyframes drift{
+    0%,100%{ transform:translateY(0) translateX(0); }
+    50%{ transform:translateY(-12px) translateX(8px); }
+  }
+  .card-glow{
+    position:fixed;
+    width:420px; height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(143,143,184,0.38), transparent 70%);
+    filter:blur(30px);
+    animation: glow-breathe 6.5s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.6; transform:scale(1); }
+    50%{ opacity:0.95; transform:scale(1.06); }
+  }
+  .pages{ position:relative; }
+  .page{ display:none; }
+  .page.active{ display:flex; flex-direction:column; justify-content:center; animation: page-fade 0.4s ease; }
+  @keyframes page-fade{
+    from{ opacity:0; transform:translateX(10px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .page-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    margin-top:26px;
+  }
+  .page-nav .page-btn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid rgba(86,90,132,0.32);
+    background: rgba(86,90,132,0.1);
+    color: var(--dusk-deep);
+    font-size:17px;
+    line-height:1;
+    padding:0;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .page-nav .page-btn:disabled{ opacity:0.28; cursor:default; }
+  .page-nav .page-btn:not(:disabled):active{ transform:scale(0.9); }
+  .page-dots{ display:flex; align-items:center; gap:7px; }
+  .page-dots .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background: rgba(86,90,132,0.3);
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .page-dots .dot.active{ background: var(--dusk-deep); transform:scale(1.35); }
+  .fx-mote{
+    position:absolute;
+    border-radius:50%;
+    background: radial-gradient(circle, var(--mote-color, rgba(255,255,255,0.95)), transparent 72%);
+    filter: blur(0.5px);
+    animation: mote-bounce 6.8s ease-in-out infinite;
+    z-index:-1;
+    pointer-events:none;
+  }
+  @keyframes mote-bounce{
+    0%{ transform:translateY(0) translateX(0) scale(0.5); opacity:0; }
+    10%{ opacity:0.4; }
+    30%{ transform:translateY(-24px) translateX(-9px) scale(0.75); }
+    50%{ transform:translateY(-48px) translateX(9px) scale(0.85); opacity:0.45; }
+    70%{ transform:translateY(-70px) translateX(-6px) scale(0.7); }
+    88%{ opacity:0.1; }
+    100%{ transform:translateY(-98px) translateX(6px) scale(0.5); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .float, .page, .fx-mote, .card-glow, .envelope-body, .seal, .mark, .wm-horizon .sun, .wm-horizon .bird{ animation:none; }
+  }
+  @media (max-width:480px){
+    .note{ padding:36px 24px 36px; }
+    .wm-horizon{ height:86px; width:calc(100% + 52px); margin:0 -26px 8px; }
+    .float{ opacity:0.6; }
+    .float.f1{ top:6%; left:2%; font-size:15px; }
+    .float.f2{ top:15%; right:2%; font-size:12px; }
+    .float.f3{ bottom:10%; left:2%; font-size:11px; }
+    .float.f4{ bottom:17%; right:2%; font-size:14px; }
+    .float.f5{ top:3%; left:32%; font-size:10px; }
+    .float.f6{ top:11%; right:29%; font-size:13px; }
+    .float.f7{ bottom:3%; left:35%; font-size:11px; }
+    .float.f8{ bottom:13%; right:33%; font-size:9px; }
+  }
+
+  /* --- Hiệu ứng mở thư --- */
+  .envelope-scene{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+    transition:opacity 0.5s ease;
+  }
+  .envelope-scene.scene-hide{
+    opacity:0;
+    pointer-events:none;
+  }
+  .envelope{
+    position:relative;
+    width:min(320px, 86vw);
+    height:min(219px, 59vw);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    outline:none;
+    perspective:700px;
+  }
+  .envelope:focus-visible .envelope-body{
+    box-shadow:0 0 0 3px rgba(255,255,255,0.6), 0 20px 45px rgba(0,0,0,0.28);
+  }
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background:#8f8fb8;
+    border-radius:10px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.28);
+    overflow:hidden;
+  }
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:60%;
+    background:#6b6f9c;
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    transition:transform 0.7s cubic-bezier(.6,-0.28,.74,.05);
+    z-index:2;
+  }
+  .envelope.opening .envelope-flap{
+    transform:rotateX(-165deg);
+  }
+  .seal{
+    position:absolute;
+    top:38%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:54px; height:54px;
+    border-radius:50%;
+    background:#faf6f0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#565a84;
+    font-size:18px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.25);
+    z-index:3;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+  }
+  .envelope.opening .seal{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.5);
+  }
+  .envelope-hint{
+    position:absolute;
+    bottom:-32px;
+    left:0; right:0;
+    text-align:center;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:13px;
+    color:#4a4763;
+    animation:hint-bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes hint-bounce{
+    0%,100%{ transform:translateY(0); opacity:0.85; }
+    50%{ transform:translateY(4px); opacity:1; }
+  }
+  .envelope.opening .envelope-hint{ opacity:0; }
+  #letter-card{
+    opacity:0;
+    transform:translateY(24px) scale(0.96);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  #letter-card.card-visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .envelope-flap{ transition:transform 0.01s linear; }
+    .envelope-hint{ animation:none; }
+    #letter-card{ transition:opacity 0.2s linear; transform:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="envelope-scene" id="envelope-scene">
+    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Nhấn để mở thư">
+      <div class="envelope-body">
+        <div class="envelope-flap"></div>
+        <div class="seal">
+          <svg width="24" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2,12 C5,4 9,4 12,9 M22,12 C19,4 15,4 12,9"/></svg>
+        </div>
+      </div>
+      <div class="envelope-hint">Chạm để mở thư</div>
+    </div>
+  </div>
+  <div class="card-glow"></div>
+  <span class="float f1">☾</span>
+  <span class="float f2">☆</span>
+  <span class="float f3">☾</span>
+  <span class="float f4">☆</span>
+  <span class="float f5">☾</span>
+  <span class="float f6">☆</span>
+  <span class="float f7">☾</span>
+  <span class="float f8">☆</span>
+  <div class="note" id="letter-card">
+    <span class="fx-mote" style="width:4px; height:4px; left:8%; bottom:10%; animation-delay:0s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:18%; bottom:52%; animation-delay:0.7s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:30%; bottom:26%; animation-delay:1.4s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:42%; bottom:66%; animation-delay:2.1s;"></span>
+    <span class="fx-mote" style="width:4px; height:4px; left:54%; bottom:14%; animation-delay:2.8s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:64%; bottom:44%; animation-delay:3.5s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:74%; bottom:70%; animation-delay:4.2s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:84%; bottom:24%; animation-delay:4.9s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:92%; bottom:56%; animation-delay:5.6s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:12%; bottom:76%; animation-delay:6.1s;"></span>
+    <svg class="wm-horizon" viewBox="0 0 600 130" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <radialGradient id="chiaTaySun" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glow)" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="var(--glow)" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="300" cy="58" r="55" fill="url(#chiaTaySun)"/>
+      <circle class="sun" cx="300" cy="62" r="26" fill="var(--glow)"/>
+      <path d="M-40,92 C 80,74 160,88 260,76 C 360,64 460,84 650,70 L650,130 L-40,130 Z" fill="var(--dusk)" opacity="0.32"/>
+      <path d="M-40,108 C 100,92 220,106 340,92 C 460,78 560,98 650,90 L650,130 L-40,130 Z" fill="var(--dusk-deep)" opacity="0.5"/>
+      <g class="birds" stroke="var(--dusk-deep)" stroke-width="2" stroke-linecap="round" fill="none">
+        <path class="bird bird-1" d="M168,44 C171,37 175,37 178,42 M188,44 C185,37 181,37 178,42"/>
+        <path class="bird bird-2" d="M392,32 C394,28 396,28 398,31 M404,32 C402,28 400,28 398,31"/>
+        <path class="bird bird-3" d="M440,50 C442,46 444,46 446,49 M452,50 C450,46 448,46 446,49"/>
+      </g>
+    </svg>
+    <div class="eyebrow-wrap"><div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><path d="M2,12 C5,4 9,4 12,9 M22,12 C19,4 15,4 12,9"/></svg>{{ label or "Lời Chia Tay" }}</div></div>
+    <div class="status"><span>{{ date }}</span></div>
+    <div class="greeting">{{ greeting }}</div>
+    <div class="divider"><span class="line"></span><svg width="20" height="14" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2,12 C5,4 9,4 12,9 M22,12 C19,4 15,4 12,9"/></svg><span class="line"></span></div>
+    {% set pages = content %}
+    <div class="pages" id="letter-pages">
+      {% for page in pages %}
+      <div class="page{% if loop.first %} active{% endif %}">
+        <div class="body-text">
+          {% for doan in page %}
+          <p>{{ doan }}</p>
+          {% endfor %}
+        </div>
+        {% if loop.last %}
+        <div class="closing">
+          <div class="closing-text">{{ closing }}</div>
+          <div class="signature">{{ sign }}</div>
+          <div class="mark">
+            <svg width="22" height="14" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2,12 C5,4 9,4 12,9 M22,12 C19,4 15,4 12,9"/></svg>
+          </div>
+        </div>
+        {% if postscript %}
+        <div class="ps">{{ postscript }}</div>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if pages|length > 1 %}
+    <div class="page-nav">
+      <button type="button" class="page-btn page-prev" aria-label="Trang trước" disabled>‹</button>
+      <div class="page-dots">
+        {% for page in pages %}
+        <span class="dot{% if loop.first %} active{% endif %}"></span>
+        {% endfor %}
+      </div>
+      <button type="button" class="page-btn page-next" aria-label="Trang sau">›</button>
+    </div>
+    {% endif %}
+  </div>
+
+<script>
+(function(){
+  var envelope = document.getElementById('envelope');
+  var scene = document.getElementById('envelope-scene');
+  var card = document.getElementById('letter-card');
+  if(!envelope || !scene || !card) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var opened = false;
+
+  function openLetter(){
+    if(opened) return;
+    opened = true;
+    envelope.classList.add('opening');
+    var delay = reduced ? 30 : 650;
+    setTimeout(function(){
+      scene.classList.add('scene-hide');
+      card.classList.add('card-visible');
+    }, delay);
+    setTimeout(function(){
+      scene.style.display = 'none';
+    }, delay + (reduced ? 30 : 500));
+  }
+
+  envelope.addEventListener('click', openLetter);
+  envelope.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+      e.preventDefault();
+      openLetter();
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var wrap = document.getElementById('letter-pages');
+  if(!wrap) return;
+
+  (function balanceLastPage(){
+    var pgs = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+    if(pgs.length < 2) return;
+    var lastIdx = pgs.length - 1;
+    var closing = pgs[lastIdx].querySelector('.closing');
+    if(!closing) return;
+
+    pgs.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+    var heights = pgs.map(function(p){ return p.offsetHeight; });
+    pgs.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+
+    var refHeight = Math.max.apply(null, heights.slice(0, lastIdx));
+    var lastHeight = heights[lastIdx];
+    if(lastHeight <= refHeight + 40) return;
+
+    var ps = pgs[lastIdx].querySelector('.ps');
+    var newPage = document.createElement('div');
+    newPage.className = 'page';
+    newPage.appendChild(closing);
+    if(ps) newPage.appendChild(ps);
+    wrap.appendChild(newPage);
+
+    var dotsWrap = document.querySelector('.page-dots');
+    if(dotsWrap){
+      var dot = document.createElement('span');
+      dot.className = 'dot';
+      dotsWrap.appendChild(dot);
+    }
+  })();
+
+  var pages = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+  if(pages.length <= 1) return;
+
+  pages.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+  var maxHeight = Math.max.apply(null, pages.map(function(p){ return p.offsetHeight; }));
+  pages.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+  wrap.style.minHeight = maxHeight + 'px';
+
+  var nav = document.querySelector('.page-nav');
+  var dots = nav ? Array.prototype.slice.call(nav.querySelectorAll('.dot')) : [];
+  var prevBtn = nav ? nav.querySelector('.page-prev') : null;
+  var nextBtn = nav ? nav.querySelector('.page-next') : null;
+  var current = 0;
+
+  function show(idx){
+    idx = Math.max(0, Math.min(pages.length - 1, idx));
+    if(idx === current) return;
+    pages[current].classList.remove('active');
+    pages[idx].classList.add('active');
+    if(dots[current]) dots[current].classList.remove('active');
+    if(dots[idx]) dots[idx].classList.add('active');
+    current = idx;
+    if(prevBtn) prevBtn.disabled = current === 0;
+    if(nextBtn) nextBtn.disabled = current === pages.length - 1;
+    var rect = wrap.getBoundingClientRect();
+    if(rect.top < -10){ wrap.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+
+  if(prevBtn) prevBtn.addEventListener('click', function(){ show(current - 1); });
+  if(nextBtn) nextBtn.addEventListener('click', function(){ show(current + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight') show(current + 1);
+    else if(e.key === 'ArrowLeft') show(current - 1);
+  });
+})();
+</script>
+</body>
+</html>

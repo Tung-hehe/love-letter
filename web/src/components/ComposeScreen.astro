@@ -41,24 +41,28 @@
   </div>
   <div class="screen-body">
     <form id="letter-form">
-      <div class="field">
-        <label for="f-title">Tiêu đề</label>
-        <input type="text" id="f-title" name="title" />
+      <div class="field-pair">
+        <div class="field">
+          <label for="f-title">Tiêu đề</label>
+          <input type="text" id="f-title" name="title" />
+        </div>
+
+        <div class="field">
+          <label for="f-date">Ngày</label>
+          <input type="text" id="f-date" name="date" placeholder="20 tháng 7, 2026" />
+        </div>
       </div>
 
-      <div class="field">
-        <label for="f-date">Ngày</label>
-        <input type="text" id="f-date" name="date" placeholder="20 tháng 7, 2026" />
-      </div>
+      <div class="field-pair">
+        <div class="field">
+          <label for="f-greeting">Lời chào</label>
+          <input type="text" id="f-greeting" name="greeting" />
+        </div>
 
-      <div class="field">
-        <label for="f-greeting">Lời chào</label>
-        <input type="text" id="f-greeting" name="greeting" />
-      </div>
-
-      <div class="field">
-        <label for="f-label">Nhãn nhỏ (không bắt buộc)</label>
-        <input type="text" id="f-label" name="label" placeholder="Để trống sẽ dùng nhãn mặc định của phong cách" />
+        <div class="field">
+          <label for="f-label">Nhãn nhỏ (không bắt buộc)</label>
+          <input type="text" id="f-label" name="label" placeholder="Để trống sẽ dùng nhãn mặc định của phong cách" />
+        </div>
       </div>
 
       <div class="field content-field">
@@ -151,5 +155,12 @@
   @media (min-width:1040px){
     .compose-actions{display:none;}
     .topbar-compose-actions{display:flex;}
+
+    /* Cột soạn thư lúc này rộng hơn hẳn nửa màn hình còn lại (đã trừ sidebar),
+       520px mặc định của .screen-body (BaseLayout) để trống khá nhiều — nới rộng
+       ra và ghép 2 trường ngắn (Tiêu đề/Ngày, Lời chào/Nhãn nhỏ) trên 1 hàng thay
+       vì xếp dọc từng cái, đỡ phải cuộn nhiều mới hết form. */
+    #screen-compose .screen-body{max-width:680px;}
+    .field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   }
 </style>
