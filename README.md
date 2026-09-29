@@ -1,8 +1,8 @@
-# Thư Tay ✉️
+# Love letter ✉️
 
-Tạo thư tay đẹp với nhiều chủ đề: tình yêu, gia đình, bạn bè ... Xem chi tiết tại [post sau](https://www.tungtt.dev/blog/love-letter-projects)
+Create beautiful letters on many themes: love, family, friends... See details in [this post](https://www.tungtt.dev/blog/love-letter-projects)
 
-## Cấu trúc
+## Structure
 
 ```
 love-letter-project/
@@ -40,7 +40,7 @@ love-letter-project/
     └── public/
 ```
 
-## Chạy app web
+## Run app web
 
 ```bash
 cd web
@@ -48,13 +48,13 @@ npm install
 npm run dev        # http://localhost:4321, có hot-reload
 ```
 
-Build thử bản production trước khi deploy:
+## Build
 
 ```bash
 npm run build && npm run preview
 ```
 
-## Chạy script
+## Run script
 
 ```bash
 pip install jinja2 pyyaml
