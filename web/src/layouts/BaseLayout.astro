@@ -27,7 +27,11 @@ const { title = 'Thư Tay' } = Astro.props;
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/icons/icon.svg" />
 <style is:global>
-  :root{
+  /* :root (mặc định) và :root[data-theme="light"] (chọn tay) dùng chung 1 bộ giá
+     trị — gộp lại 1 rule thay vì viết 2 lần. Vẫn phải để riêng bản dark (media
+     query prefers-color-scheme không gộp được với attribute selector trong cùng
+     1 rule nếu không dùng light-dark(), rủi ro tương thích hơn nên giữ tách). */
+  :root, :root[data-theme="light"]{
     --paper: #FDFBF8;
     --paper-raised: #FFFFFF;
     --ink: #4A3F3D;
@@ -74,14 +78,6 @@ const { title = 'Thư Tay' } = Astro.props;
     --preview-bg: #262023;
     --border: rgba(243,236,233,0.11); --border-strong: rgba(243,236,233,0.20); --shadow: rgba(0,0,0,0.45);
     --danger: #DE9186; --danger-bg: rgba(222,145,134,0.13);
-  }
-  :root[data-theme="light"]{
-    --paper: #FDFBF8; --paper-raised: #FFFFFF; --ink: #4A3F3D; --ink-soft: #8B7D7A;
-    --ink-faint: #BFB3AF; --accent: #C08A93; --accent-fill: #B07680; --accent-soft: #EDD2D6;
-    --accent-bg: #FAF0F1; --gold: #C9A876; --gold-bg: #F7EFDF;
-    --preview-bg: #F6F0EB;
-    --border: rgba(74,63,61,0.10); --border-strong: rgba(74,63,61,0.18); --shadow: rgba(74,63,61,0.10);
-    --danger: #C06B5E; --danger-bg: #FAEAE6;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -159,6 +155,22 @@ const { title = 'Thư Tay' } = Astro.props;
     box-shadow:0 4px 10px var(--shadow);
   }
 
+  /* Thanh hành động dưới cùng, dùng chung giữa Soạn thư (.compose-actions) và
+     Phong cách thư (.picker-actions) — luôn bấm được ngay, không phải cuộn hết
+     trang mới thấy. Ẩn hẳn từ ngưỡng có xem trước trực tiếp bên phải (>=1040px,
+     lúc đó dùng nút gọn trong thanh trên cùng thay thế — xem ComposeScreen.astro/
+     StylePickerScreen.astro). Nội dung bên trong (.compose-actions-inner/
+     .picker-actions-inner) khác nhau tuỳ màn (1 nút hay 2 nút cạnh nhau) nên vẫn
+     định nghĩa riêng ở từng file. */
+  .sticky-actions{
+    flex-shrink:0;position:sticky;bottom:0;
+    padding:12px 18px calc(14px + env(safe-area-inset-bottom));
+    border-top:0.5px solid var(--border);background:var(--paper);
+  }
+  @media (min-width:1040px){
+    .sticky-actions{display:none;}
+  }
+
   .field label{
     display:block;font-size:11px;font-weight:500;letter-spacing:0.04em;
     text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;
@@ -213,6 +225,13 @@ const { title = 'Thư Tay' } = Astro.props;
     .screen-stack.show-detail-empty #screen-detail-empty{
       display:flex;
     }
+
+    /* Màn "Xem thư qua link chia sẻ" (/xem/:data) là điểm đến từ bên ngoài, không
+       phải 1 bước trong luồng soạn thư — ẩn hẳn thư viện bên trái (vô nghĩa với
+       người xem, có thể không phải người đang dùng app trên máy này) và cho nó
+       chiếm trọn chiều ngang thay vì chỉ cột 2. */
+    #screen-shared{grid-column:1/-1;}
+    .screen-stack.show-shared #screen-home{display:none !important;}
   }
 
   /* Phong cách thư / Soạn thư: chia đôi đều với phần xem trước, chỉ khi đủ rộng

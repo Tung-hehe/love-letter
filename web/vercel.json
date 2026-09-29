@@ -2,7 +2,8 @@
   "rewrites": [
     { "source": "/edit/:id", "destination": "/" },
     { "source": "/edit/:id/style", "destination": "/" },
-    { "source": "/edit/:id/preview", "destination": "/" }
+    { "source": "/edit/:id/preview", "destination": "/" },
+    { "source": "/xem/:data", "destination": "/" }
   ],
   "headers": [
     { "source": "/sw.js", "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }] }

@@ -34,6 +34,9 @@
       <button type="button" id="compose-save-btn" class="icon-btn" aria-label="Lưu nháp" title="Lưu nháp">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5V4z"/><path d="M8 4v5h7V4"/><path d="M8 13h8v6H8z"/></svg>
       </button>
+      <button type="button" id="compose-link-btn" class="icon-btn" aria-label="Tạo link chia sẻ" title="Tạo link chia sẻ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l2-2a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.54-.54l-2 2a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>
+      </button>
       <button type="button" id="compose-share-btn" class="icon-btn compose-share-btn" aria-label="Chia sẻ" title="Chia sẻ">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.5 15.7 6.6M8.3 13.5 15.7 17.4"/></svg>
       </button>
@@ -89,7 +92,7 @@
       </div>
     </form>
   </div>
-  <div class="compose-actions">
+  <div class="sticky-actions">
     <div class="compose-actions-inner">
       <button type="button" id="preview-btn" class="primary-btn">Xem thư</button>
     </div>
@@ -132,13 +135,9 @@
     border:1px dashed var(--border-strong);background:transparent;
     border-radius:11px;padding:11px;font-family:inherit;
   }
-  /* Thanh hành động dưới cùng — luôn bấm được ngay, không phải cuộn hết form
-     dài mới thấy. Chỉ dùng trên di động/tablet dọc, xem ghi chú đầu file. */
-  .compose-actions{
-    flex-shrink:0;position:sticky;bottom:0;
-    padding:12px 18px calc(14px + env(safe-area-inset-bottom));
-    border-top:0.5px solid var(--border);background:var(--paper);
-  }
+  /* Thanh hành động dưới cùng (.sticky-actions, định nghĩa chung ở BaseLayout) —
+     luôn bấm được ngay, không phải cuộn hết form dài mới thấy. Chỉ dùng trên di
+     động/tablet dọc, xem ghi chú đầu file. */
   .compose-actions-inner{max-width:520px;margin:0 auto;width:100%;}
 
   /* Nhóm nút Tải/Lưu/Chia sẻ gọn trong thanh trên cùng — chỉ hiện từ ngưỡng có
@@ -153,7 +152,6 @@
   }
 
   @media (min-width:1040px){
-    .compose-actions{display:none;}
     .topbar-compose-actions{display:flex;}
 
     /* Cột soạn thư lúc này rộng hơn hẳn nửa màn hình còn lại (đã trừ sidebar),

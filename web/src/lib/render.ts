@@ -4,7 +4,7 @@
 // Port từ app/js/render.js (bản cũ).
 
 import { renderTemplate } from './tiny-jinja';
-import { TEMPLATE_LIST } from '../data/templates';
+import { getTemplateMeta } from '../data/templates';
 import type { Letter, LetterContext, LetterPage } from './types';
 
 const templateSourceCache = new Map<string, string>();
@@ -19,10 +19,12 @@ async function fetchTemplateSource(file: string): Promise<string> {
   return text;
 }
 
-function buildPages(content: LetterPage[] | string[] | undefined): LetterPage[] {
+// Danh sách đoạn văn phẳng (định dạng cũ, trước khi có ngắt trang tuỳ chỉnh) ->
+// danh sách trang, tự chia 3 đoạn/trang như hành vi cũ. Dùng chung với app.ts's
+// migrateContentToPages (chỉ khác nhau ở giá trị trả về khi content rỗng, xem đó).
+export function buildPages(content: LetterPage[] | string[] | undefined): LetterPage[] {
   if (!content || !content.length) return [];
   if (Array.isArray(content[0])) return content as LetterPage[]; // đã là danh sách trang
-  // định dạng cũ (danh sách đoạn văn phẳng) -> tự động chia 3 đoạn/trang
   const flat = content as string[];
   const pages: LetterPage[] = [];
   for (let i = 0; i < flat.length; i += 3) pages.push(flat.slice(i, i + 3));
@@ -43,7 +45,7 @@ function normalizeLetterContext(ctx: LetterContext): Record<string, unknown> {
 }
 
 export async function renderLetter(templateId: string, ctx: LetterContext | Letter): Promise<string> {
-  const meta = TEMPLATE_LIST.find((t) => t.id === templateId) || TEMPLATE_LIST[0];
+  const meta = getTemplateMeta(templateId);
   const src = await fetchTemplateSource(meta.file);
   return renderTemplate(src, normalizeLetterContext(ctx));
 }

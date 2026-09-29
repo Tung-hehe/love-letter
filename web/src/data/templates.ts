@@ -127,3 +127,10 @@ export const TEMPLATE_LIST: TemplateMeta[] = [
     sample: { title: 'Chúc mừng cậu nhé', greeting: 'Gửi cậu,', closing: 'Chúc mừng cậu thật nhiều', sign: 'Người luôn ủng hộ cậu',
       content: [['Nghe tin vui của cậu mà mình mừng muốn nhảy cẫng lên luôn!', 'Xứng đáng lắm, chúc cậu sẽ còn tiến xa hơn nữa nhé.']] } },
 ];
+
+// Tra cứu theo id, có fallback về phong cách đầu tiên khi id không còn tồn tại
+// (template đã bị xoá/đổi id) — dùng chung ở cả app.ts lẫn render.ts thay vì mỗi
+// nơi tự viết lại find(...) || TEMPLATE_LIST[0].
+export function getTemplateMeta(id: string): TemplateMeta {
+  return TEMPLATE_LIST.find((t) => t.id === id) || TEMPLATE_LIST[0];
+}

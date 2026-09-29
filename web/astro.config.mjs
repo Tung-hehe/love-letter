@@ -1,14 +1,15 @@
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 
-// /edit/:id, /edit/:id/style, /edit/:id/preview không phải trang thật — đó là
-// route ảo do app.ts tự xử lý bằng history.pushState (id thư nằm trong
-// localStorage, không có lúc build). Khi deploy, vercel.json rewrite các path đó
-// về index.html; ở đây làm tương tự cho `astro dev`/`astro preview` cục bộ, kẻo
-// F5 thẳng vào /edit/xxx sẽ bị 404.
+// /edit/:id, /edit/:id/style, /edit/:id/preview, /xem/:data không phải trang
+// thật — đó là route ảo do app.ts tự xử lý bằng history.pushState (dữ liệu nằm
+// trong localStorage hoặc ngay trong URL, không có lúc build). Khi deploy,
+// vercel.json rewrite các path đó về index.html; ở đây làm tương tự cho
+// `astro dev`/`astro preview` cục bộ, kẻo F5 thẳng vào /edit/xxx hay /xem/xxx sẽ
+// bị 404.
 function editRouteFallback() {
   const rewrite = (req, _res, next) => {
-    if (req.url && req.url.startsWith('/edit/')) req.url = '/';
+    if (req.url && (req.url.startsWith('/edit/') || req.url.startsWith('/xem/'))) req.url = '/';
     next();
   };
   return {

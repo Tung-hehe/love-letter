@@ -24,7 +24,7 @@
     <p class="subtitle">Mỗi phong cách một sắc thái riêng — chọn rồi xác nhận để bắt đầu soạn</p>
     <div id="picker-grid" class="picker-grid"></div>
   </div>
-  <div class="picker-actions">
+  <div class="sticky-actions">
     <div class="picker-actions-inner">
       <button type="button" id="picker-view-sample" class="secondary-btn">Xem mẫu</button>
       <button type="button" id="picker-confirm" class="primary-btn">Xác nhận</button>
@@ -69,13 +69,9 @@
   .t-check svg{width:11px;height:11px;}
   .theme-card.picked .t-check{opacity:1;transform:scale(1);}
 
-  /* Thanh hành động dưới cùng: nội dung căn theo đúng chiều rộng cột nội dung
-     (520px, khớp .screen-body) thay vì kéo dài hết cỡ trên màn hình rộng. */
-  .picker-actions{
-    flex-shrink:0;position:sticky;bottom:0;
-    padding:12px 18px calc(14px + env(safe-area-inset-bottom));
-    border-top:0.5px solid var(--border);background:var(--paper);
-  }
+  /* Thanh hành động dưới cùng (.sticky-actions, định nghĩa chung ở BaseLayout) —
+     nội dung căn theo đúng chiều rộng cột nội dung (520px, khớp .screen-body)
+     thay vì kéo dài hết cỡ trên màn hình rộng. */
   .picker-actions-inner{display:flex;gap:10px;max-width:520px;margin:0 auto;width:100%;}
   .picker-actions-inner .secondary-btn, .picker-actions-inner .primary-btn{margin:0;box-shadow:none;flex:1;}
   .picker-actions-inner .primary-btn{box-shadow:0 10px 22px var(--shadow);}
@@ -84,6 +80,5 @@
      trong thanh trên cùng thay cho thanh cố định ở đáy. */
   @media (min-width:1040px){
     #picker-confirm-top{display:inline-flex;}
-    .picker-actions{display:none;}
   }
 </style>

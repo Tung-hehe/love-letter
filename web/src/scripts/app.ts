@@ -2,17 +2,21 @@
 // + lưu thư vào localStorage, xem lại và chia sẻ.
 // Port từ app/js/app.js (bản Astro cũ), có kiểu dữ liệu.
 
-import { TEMPLATE_LIST } from '../data/templates';
-import { renderLetter } from '../lib/render';
-import type { Letter, LetterContext, LetterPage, TemplateMeta } from '../lib/types';
+import { TEMPLATE_LIST, getTemplateMeta } from '../data/templates';
+import { renderLetter, buildPages } from '../lib/render';
+import { encodeSharedLetter, decodeSharedLetter, sharedLetterUrl } from '../lib/shareLink';
+import type { Letter, LetterContext, LetterPage } from '../lib/types';
 
 const LETTERS_KEY = 'thu-tay-letters-v1';
 const OLD_DRAFT_KEY = 'thu-tay-draft-v1';
 const THEME_KEY = 'thu-tay-theme';
 const DEFAULT_TEMPLATE_ID = 'am_ap';
+const UNTITLED_LETTER = 'Thư chưa có tiêu đề';
 
-type FormFields = Pick<Letter, 'title' | 'date' | 'greeting' | 'label' | 'content' | 'closing' | 'sign' | 'postscript'>;
-type ScreenName = 'home' | 'picker' | 'compose' | 'letterPreview';
+// FormFields và LetterContext cùng là "mọi trường của Letter trừ id/templateId/
+// updatedAt" — dùng chung 1 type thay vì định nghĩa lại.
+type FormFields = LetterContext;
+type ScreenName = 'home' | 'picker' | 'compose' | 'letterPreview' | 'shared';
 type NavOpts = { noHistory?: boolean } | undefined;
 
 let letters: Letter[] = [];
@@ -33,6 +37,7 @@ const els = {
     picker: byId('screen-picker'),
     compose: byId('screen-compose'),
     letterPreview: byId('screen-letter-preview'),
+    shared: byId('screen-shared'),
   } satisfies Record<ScreenName, HTMLElement>,
 
   letterList: byId('letter-list'),
@@ -55,6 +60,7 @@ const els = {
   composeStyleBtn: byId('compose-style-btn'),
   composeDownloadBtn: byId('compose-download-btn'),
   composeSaveBtn: byId('compose-save-btn'),
+  composeLinkBtn: byId('compose-link-btn'),
   composeShareBtn: byId('compose-share-btn'),
 
   previewTitle: byId('preview-title'),
@@ -63,7 +69,10 @@ const els = {
   previewBottomBar: byId('preview-bottom-bar'),
   saveDraftBtn: byId('save-draft-btn'),
   downloadBtn: byId('download-btn'),
+  linkBtn: byId('link-btn'),
   shareBtn: byId('share-btn'),
+
+  sharedFrame: byId<HTMLIFrameElement>('shared-frame'),
 
   livePreviewFrame: byId<HTMLIFrameElement>('live-preview-frame'),
   livePreviewReloadBtn: byId('live-preview-reload'),
@@ -80,13 +89,19 @@ const els = {
   fPostscript: byId<HTMLInputElement>('f-postscript'),
 };
 
-function templateMeta(id: string): TemplateMeta {
-  return TEMPLATE_LIST.find((t) => t.id === id) || TEMPLATE_LIST[0];
-}
-
 function escapeHtml(str: unknown): string {
   const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
   return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => map[c]);
+}
+
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
+// SVG icon dùng chung cho thẻ phong cách (màn Phong cách thư) lẫn icon thư đã
+// lưu (màn Thư viện) — cùng 1 khung viewBox/stroke, chỉ khác nội dung path.
+function templateIconSvg(icon: string): string {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>`;
 }
 
 function slugify(str: string | undefined): string {
@@ -127,6 +142,7 @@ function showScreen(name: ScreenName) {
   if (els.screenStack) {
     els.screenStack.classList.toggle('show-live-preview', name === 'picker' || name === 'compose');
     els.screenStack.classList.toggle('show-detail-empty', name === 'home');
+    els.screenStack.classList.toggle('show-shared', name === 'shared');
   }
   window.scrollTo(0, 0);
 }
@@ -198,21 +214,28 @@ function goCompose(opts?: NavOpts) {
   updateLivePreview();
 }
 
+// Render currentLetter -> letterPreviewHtml, báo lỗi qua alert nếu thất bại.
+// Dùng chung cho goLetterPreview() (xem thư, có chuyển màn) và
+// renderLetterPreviewHtml() (Tải/Chia sẻ ngay tại Soạn thư, không chuyển màn).
+async function renderCurrentLetterHtml(): Promise<boolean> {
+  try {
+    letterPreviewHtml = await renderLetter(currentLetter!.templateId, currentLetter!);
+    return true;
+  } catch (err) {
+    window.alert('Không dựng được lá thư: ' + errMsg(err));
+    return false;
+  }
+}
+
 async function goLetterPreview(opts?: NavOpts) {
   previewIsSample = false;
   els.previewBottomBar.hidden = false;
-  const meta = templateMeta(currentLetter!.templateId);
+  const meta = getTemplateMeta(currentLetter!.templateId);
   els.previewTitle.textContent = `Xem thư · ${meta.name}`;
   els.previewFrame.srcdoc = '';
   showScreen('letterPreview');
   syncUrl(routePath('letterPreview', currentLetter!.id), opts);
-  try {
-    const html = await renderLetter(currentLetter!.templateId, currentLetter!);
-    letterPreviewHtml = html;
-    els.previewFrame.srcdoc = html;
-  } catch (err) {
-    window.alert('Không dựng được lá thư: ' + (err instanceof Error ? err.message : String(err)));
-  }
+  if (await renderCurrentLetterHtml()) els.previewFrame.srcdoc = letterPreviewHtml;
 }
 
 // Xem trước toàn màn hình nội dung MẪU của phong cách đang chọn ở màn Phong cách
@@ -221,7 +244,7 @@ async function goLetterPreview(opts?: NavOpts) {
 // #screen-letter-preview nhưng ẩn thanh nút Tải/Lưu/Chia sẻ vì đây chưa phải thư
 // thật, và không đụng tới URL (chỉ là xem thử nhanh, không cần bookmark được).
 async function goSamplePreview() {
-  const meta = templateMeta(currentLetter!.templateId);
+  const meta = getTemplateMeta(currentLetter!.templateId);
   if (!meta.sample) return;
   previewIsSample = true;
   els.previewBottomBar.hidden = true;
@@ -236,7 +259,7 @@ async function goSamplePreview() {
   try {
     els.previewFrame.srcdoc = await renderLetter(currentLetter!.templateId, ctx);
   } catch (err) {
-    window.alert('Không dựng được bản xem mẫu: ' + (err instanceof Error ? err.message : String(err)));
+    window.alert('Không dựng được bản xem mẫu: ' + errMsg(err));
   }
 }
 
@@ -260,7 +283,7 @@ function isLetterEmpty(letter: Letter): boolean {
 
 function applySampleIfEmpty(letter: Letter) {
   if (!isLetterEmpty(letter)) return;
-  const meta = templateMeta(letter.templateId);
+  const meta = getTemplateMeta(letter.templateId);
   if (!meta.sample) return;
   Object.assign(letter, meta.sample);
 }
@@ -275,7 +298,7 @@ let livePreviewRequestId = 0;
 async function updateLivePreview() {
   if (!currentLetter || !els.livePreviewFrame) return;
   const requestId = ++livePreviewRequestId;
-  const meta = templateMeta(currentLetter.templateId);
+  const meta = getTemplateMeta(currentLetter.templateId);
   const ctx = (isLetterEmpty(currentLetter) && meta.sample)
     ? Object.assign({}, currentLetter, meta.sample)
     : currentLetter;
@@ -288,22 +311,17 @@ async function updateLivePreview() {
     // Không chặn soạn thư nếu render lỗi, nhưng vẫn hiện lỗi thay vì để trắng xoá
     // im lặng — dễ phát hiện khi template lỗi hoặc chưa tải được (VD mất mạng,
     // mở app không qua server nên đường dẫn /templates/... không tải được).
-    const message = e instanceof Error ? e.message : String(e);
-    els.livePreviewFrame.srcdoc = `<!doctype html><body style="display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#8a6b76;text-align:center;font-size:14px;">Không tải được bản xem trước: ${escapeHtml(message)}</body>`;
+    els.livePreviewFrame.srcdoc = `<!doctype html><body style="display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#8a6b76;text-align:center;font-size:14px;">Không tải được bản xem trước: ${escapeHtml(errMsg(e))}</body>`;
   }
 }
 els.livePreviewReloadBtn.addEventListener('click', () => updateLivePreview());
 
 // ---------- lưu trữ ----------
-// Danh sách đoạn văn phẳng (định dạng cũ, trước khi có ngắt trang tuỳ chỉnh)
-// -> danh sách trang, tự chia 3 đoạn/trang như hành vi cũ.
+// Như buildPages() (render.ts) nhưng khi content rỗng trả về 1 trang/1 đoạn rỗng
+// thay vì mảng rỗng — để form soạn thư luôn có ít nhất 1 ô nhập để gõ vào.
 function migrateContentToPages(content: LetterPage[] | string[] | undefined): LetterPage[] {
-  if (!content || !content.length) return [['']];
-  if (Array.isArray(content[0])) return content as LetterPage[]; // đã là danh sách trang
-  const flat = content as string[];
-  const pages: LetterPage[] = [];
-  for (let i = 0; i < flat.length; i += 3) pages.push(flat.slice(i, i + 3));
-  return pages;
+  const pages = buildPages(content);
+  return pages.length ? pages : [['']];
 }
 
 // Id ngắn gọn cho URL (VD /edit/k3f9zq) — chỉ cần duy nhất trong máy này, không cần
@@ -323,15 +341,22 @@ function resolveTemplateId(id: string): string {
   return TEMPLATE_LIST.some((t) => t.id === id) ? id : DEFAULT_TEMPLATE_ID;
 }
 
+// Chuẩn hoá 1 thư vừa đọc từ localStorage: sửa templateId chết + chuyển content
+// cũ (danh sách đoạn văn phẳng) sang danh sách trang — dùng chung cho lúc khởi
+// động (loadLetters) lẫn lúc đồng bộ từ tab khác (xem "storage" listener bên dưới).
+function normalizeLetter(l: Letter): Letter {
+  return { ...l, templateId: resolveTemplateId(l.templateId), content: migrateContentToPages(l.content) };
+}
+
 function loadLetters() {
   try {
     const raw = localStorage.getItem(LETTERS_KEY);
     if (raw) {
       let migrated = false;
       letters = (JSON.parse(raw) || []).map((l: Letter) => {
-        const templateId = resolveTemplateId(l.templateId);
-        if (templateId !== l.templateId) migrated = true;
-        return { ...l, templateId, content: migrateContentToPages(l.content) };
+        const normalized = normalizeLetter(l);
+        if (normalized.templateId !== l.templateId) migrated = true;
+        return normalized;
       });
       if (migrated) saveLetters();
       return;
@@ -369,9 +394,7 @@ function saveLetters() {
 window.addEventListener('storage', (e) => {
   if (e.key !== LETTERS_KEY) return;
   try {
-    letters = (JSON.parse(e.newValue || '[]') || []).map((l: Letter) => ({
-      ...l, templateId: resolveTemplateId(l.templateId), content: migrateContentToPages(l.content),
-    }));
+    letters = (JSON.parse(e.newValue || '[]') || []).map(normalizeLetter);
   } catch (err) { return; }
   if (els.screens.home.classList.contains('active')) renderHome();
 });
@@ -414,14 +437,14 @@ function renderHome() {
   els.homeSubtitle.textContent = sorted.length ? `${sorted.length} lá thư đã lưu` : '';
 
   sorted.forEach((letter) => {
-    const meta = templateMeta(letter.templateId);
+    const meta = getTemplateMeta(letter.templateId);
     const card = document.createElement('div');
     card.className = 'letter-card';
     card.innerHTML = `
       <button type="button" class="letter-card-open">
-        <span class="lc-icon" style="background:${meta.iconGradient};"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${meta.icon}</svg></span>
+        <span class="lc-icon" style="background:${meta.iconGradient};">${templateIconSvg(meta.icon)}</span>
         <span class="lc-text">
-          <p class="lc-title">${escapeHtml(letter.title || 'Thư chưa có tiêu đề')}</p>
+          <p class="lc-title">${escapeHtml(letter.title || UNTITLED_LETTER)}</p>
           <p class="lc-meta">${escapeHtml(meta.name)} · ${formatRelativeTime(letter.updatedAt)}</p>
         </span>
         <span class="lc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -436,7 +459,7 @@ function renderHome() {
       goCompose();
     });
     card.querySelector('.letter-card-delete')!.addEventListener('click', () => {
-      const ok = window.confirm(`Xoá lá thư "${letter.title || 'Thư chưa có tiêu đề'}"? Không thể hoàn tác.`);
+      const ok = window.confirm(`Xoá lá thư "${letter.title || UNTITLED_LETTER}"? Không thể hoàn tác.`);
       if (!ok) return;
       letters = letters.filter((l) => l.id !== letter.id);
       saveLetters();
@@ -462,9 +485,7 @@ function renderPickerGrid() {
     card.type = 'button';
     card.className = 'theme-card' + (tpl.id === currentLetter!.templateId ? ' picked' : '');
     card.innerHTML = `
-      <span class="t-swatch" style="background:${tpl.ink};">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${tpl.icon}</svg>
-      </span>
+      <span class="t-swatch" style="background:${tpl.ink};">${templateIconSvg(tpl.icon)}</span>
       <p class="t-name">${escapeHtml(tpl.name)}</p>
       <span class="t-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
     `;
@@ -496,17 +517,21 @@ function updateParaCount(textarea: HTMLTextAreaElement) {
   countEl.classList.toggle('warn', len > PARA_WARN_LENGTH);
 }
 
+function breakToggleLabel(active: boolean): string {
+  return active ? 'Trang mới ✕' : '+ Ngắt trang';
+}
+
 function makeBreakToggle(active: boolean): HTMLElement {
   const el = document.createElement('div');
   el.className = 'para-break' + (active ? ' is-active' : '');
   el.innerHTML = `
     <span class="para-break-line"></span>
-    <button type="button" class="para-break-toggle">${active ? 'Trang mới ✕' : '+ Ngắt trang'}</button>
+    <button type="button" class="para-break-toggle">${breakToggleLabel(active)}</button>
     <span class="para-break-line"></span>
   `;
   el.querySelector('.para-break-toggle')!.addEventListener('click', () => {
     const isActive = el.classList.toggle('is-active');
-    el.querySelector('.para-break-toggle')!.textContent = isActive ? 'Trang mới ✕' : '+ Ngắt trang';
+    el.querySelector('.para-break-toggle')!.textContent = breakToggleLabel(isActive);
     syncFormToLetter();
   });
   return el;
@@ -555,7 +580,7 @@ els.addPara.addEventListener('click', () => {
 });
 
 function renderComposeForm() {
-  els.form.querySelectorAll('.field.has-error').forEach((f) => clearFieldError(f));
+  clearAllFieldErrors();
   const letter = currentLetter!;
   els.fTitle.value = letter.title;
   els.fDate.value = letter.date;
@@ -617,8 +642,12 @@ function clearFieldError(el: Element) {
   if (msg) msg.remove();
 }
 
-function validateComposeForm(ctx: FormFields): HTMLElement | null {
+function clearAllFieldErrors() {
   els.form.querySelectorAll('.field.has-error').forEach((f) => clearFieldError(f));
+}
+
+function validateComposeForm(ctx: FormFields): HTMLElement | null {
+  clearAllFieldErrors();
   let firstInvalid: HTMLElement | null = null;
   const check = (value: string, inputEl: HTMLElement, message: string) => {
     if (!value) {
@@ -700,13 +729,7 @@ els.previewBtn.addEventListener('click', handlePreviewClick);
 // chuyển màn, vì bên phải đã có xem trước trực tiếp rồi. Không lưu vào thư viện.
 async function renderLetterPreviewHtml(): Promise<boolean> {
   if (!validateCompose()) return false;
-  try {
-    letterPreviewHtml = await renderLetter(currentLetter!.templateId, currentLetter!);
-    return true;
-  } catch (err) {
-    window.alert('Không dựng được lá thư: ' + (err instanceof Error ? err.message : String(err)));
-    return false;
-  }
+  return renderCurrentLetterHtml();
 }
 
 // ---------- Màn 4: Xem thư ----------
@@ -715,15 +738,20 @@ els.letterPreviewBack.addEventListener('click', () => {
   else goCompose();
 });
 
-els.saveDraftBtn.addEventListener('click', () => {
+function saveAndGoHome() {
   saveCurrentLetter();
   goHome();
-});
+}
+els.saveDraftBtn.addEventListener('click', saveAndGoHome);
+
+function letterFilename(): string {
+  const meta = getTemplateMeta(currentLetter!.templateId);
+  return `${slugify(currentLetter!.title)}__${meta.id}.html`;
+}
 
 function downloadLetterFile() {
   if (!letterPreviewHtml) return;
-  const meta = templateMeta(currentLetter!.templateId);
-  const filename = `${slugify(currentLetter!.title)}__${meta.id}.html`;
+  const filename = letterFilename();
   const blob = new Blob([letterPreviewHtml], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -739,8 +767,7 @@ els.downloadBtn.addEventListener('click', downloadLetterFile);
 
 async function shareLetterFile() {
   if (!letterPreviewHtml) return;
-  const meta = templateMeta(currentLetter!.templateId);
-  const filename = `${slugify(currentLetter!.title)}__${meta.id}.html`;
+  const filename = letterFilename();
   const file = new File([letterPreviewHtml], filename, { type: 'text/html' });
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -756,22 +783,115 @@ async function shareLetterFile() {
 }
 els.shareBtn.addEventListener('click', shareLetterFile);
 
-// Nút Tải/Lưu/Chia sẻ ngay tại màn Soạn thư (>=1040px) — xem ghi chú đầu
+// ---------- Link chia sẻ online (/xem/:data) ----------
+// Cách khác để gửi thư, KHÔNG thay thế file .html ở trên — mã hoá toàn bộ nội
+// dung thư (kèm phong cách) ngay trong URL (xem lib/shareLink.ts), không cần
+// server lưu trữ. Tiện hơn file .html khi gửi qua Messenger/Zalo vì người nhận
+// bấm vào là xem được luôn, không phải tải file về mở.
+function currentLetterPayload() {
+  const { templateId, title, date, greeting, label, content, closing, sign, postscript } = currentLetter!;
+  return { templateId, letter: { title, date, greeting, label, content, closing, sign, postscript } };
+}
+
+// Khi cả Web Share lẫn Clipboard API đều không dùng được (VD trình duyệt trong
+// app Zalo/Messenger hay chặn 1 trong 2 API này) — hiện link trong 1 ô sẵn tự
+// bôi đen để người dùng tự bấm sao chép, thay vì window.prompt() (nhiều trình
+// duyệt nhúng trong app chat không hỗ trợ hộp thoại prompt).
+function showLinkFallback(url: string) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--paper);border-radius:14px;padding:20px;max-width:360px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);';
+  const label = document.createElement('p');
+  label.textContent = 'Sao chép link bên dưới để gửi:';
+  label.style.cssText = 'margin:0 0 10px;font-size:13.5px;color:var(--ink);';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.readOnly = true;
+  input.value = url;
+  input.style.cssText = 'width:100%;box-sizing:border-box;padding:9px 10px;border-radius:8px;border:1px solid var(--border-strong);font-size:13px;margin-bottom:10px;background:var(--paper-raised);color:var(--ink);';
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Đóng';
+  closeBtn.style.cssText = 'width:100%;padding:9px;border-radius:8px;border:none;background:var(--accent-fill);color:#fff;font-weight:600;font-family:inherit;';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  box.append(label, input, closeBtn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  input.focus();
+  input.select();
+}
+
+async function copyOrShareLink(url: string) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ url, title: currentLetter!.title || 'Bức thư' });
+      return;
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') return; // người dùng tự huỷ hộp thoại chia sẻ
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    window.alert('Đã sao chép link chia sẻ! Dán vào Messenger/Zalo để gửi.');
+  } catch (e) {
+    showLinkFallback(url);
+  }
+}
+
+async function shareLetterLink() {
+  try {
+    const url = sharedLetterUrl(await encodeSharedLetter(currentLetterPayload()));
+    await copyOrShareLink(url);
+  } catch (e) {
+    window.alert('Không tạo được link chia sẻ: ' + errMsg(e));
+  }
+}
+els.linkBtn.addEventListener('click', shareLetterLink);
+
+// Nút Tải/Lưu/Link/Chia sẻ ngay tại màn Soạn thư (>=1040px) — xem ghi chú đầu
 // ComposeScreen.astro.
 els.composeDownloadBtn.addEventListener('click', async () => {
   if (await renderLetterPreviewHtml()) downloadLetterFile();
 });
-els.composeSaveBtn.addEventListener('click', () => {
-  saveCurrentLetter();
-  goHome();
+els.composeSaveBtn.addEventListener('click', saveAndGoHome);
+els.composeLinkBtn.addEventListener('click', async () => {
+  if (validateCompose()) await shareLetterLink();
 });
 els.composeShareBtn.addEventListener('click', async () => {
   if (await renderLetterPreviewHtml()) await shareLetterFile();
 });
 
+// ---------- Màn "Xem thư qua link chia sẻ" (/xem/:data) ----------
+// Không dùng chung parseRoute()/resolveRouteAndRender() với các màn còn lại vì
+// thư ở đây không nằm trong `letters` (thư viện) — dữ liệu nằm ngay trong URL,
+// xem lib/shareLink.ts. Chỉ hiện lại 1 khung xem, không có state điều hướng
+// back/forward riêng (link chia sẻ là điểm đến từ bên ngoài, không phải màn
+// người dùng bấm qua lại nhiều lần trong lúc dùng app).
+function parseSharedRoute(pathname: string): string | null {
+  const parts = pathname.replace(/^\/|\/$/g, '').split('/').filter(Boolean);
+  return parts[0] === 'xem' && parts[1] ? decodeURIComponent(parts[1]) : null;
+}
+
+function sharedErrorHtml(message: string): string {
+  return `<!doctype html><body style="display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#8a6b76;text-align:center;font-size:14px;">${escapeHtml(message)}</body>`;
+}
+
+function tryShowSharedLetter(): boolean {
+  const data = parseSharedRoute(location.pathname);
+  if (!data) return false;
+  showScreen('shared');
+  decodeSharedLetter(data)
+    .then(({ templateId, letter }) => renderLetter(templateId, letter))
+    .then((html) => { els.sharedFrame.srcdoc = html; })
+    .catch((e) => { els.sharedFrame.srcdoc = sharedErrorHtml('Không mở được link này: ' + errMsg(e)); });
+  return true;
+}
+
 // ---------- khởi động ----------
 loadLetters();
-resolveRouteAndRender();
+if (!tryShowSharedLetter()) resolveRouteAndRender();
 
 // Service worker chỉ dành cho bản PWA thật (cài vào máy, dùng offline) — khi đang
 // chạy dev cục bộ (localhost) thì nó chỉ gây phiền vì hay phục vụ nhầm bản JS/HTML

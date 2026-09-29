@@ -39,6 +39,13 @@ def list_files(directory: Path, suffixes):
     return sorted(p for p in directory.glob("*") if p.suffix.lower() in suffixes)
 
 
+def resolve_path(raw: str) -> Path:
+    """Đường dẫn người dùng truyền qua CLI: giữ nguyên nếu đã tuyệt đối, còn không
+    thì tính tương đối theo BASE_DIR (thư mục chứa generate.py)."""
+    path = Path(raw)
+    return path if path.is_absolute() else BASE_DIR / path
+
+
 def choose_interactively(files, label):
     """Cho người dùng chọn file bằng số thứ tự nếu không truyền tham số."""
     if not files:
@@ -143,9 +150,7 @@ def main():
 
     # 1) Chọn file nội dung
     if args.content:
-        content_path = Path(args.content)
-        if not content_path.is_absolute():
-            content_path = BASE_DIR / content_path
+        content_path = resolve_path(args.content)
     else:
         content_path = choose_interactively(
             list_files(CONTENT_DIR, {".yaml", ".yml"}), "file nội dung"
@@ -156,9 +161,7 @@ def main():
 
     # 2) Chọn template
     if args.template:
-        template_path = Path(args.template)
-        if not template_path.is_absolute():
-            template_path = BASE_DIR / template_path
+        template_path = resolve_path(args.template)
     else:
         template_path = choose_interactively(
             list_files(TEMPLATE_DIR, {".html"}), "template"
@@ -174,9 +177,7 @@ def main():
     # 4) Xuất file
     OUTPUT_DIR.mkdir(exist_ok=True)
     if args.output:
-        output_path = Path(args.output)
-        if not output_path.is_absolute():
-            output_path = BASE_DIR / output_path
+        output_path = resolve_path(args.output)
     else:
         output_path = OUTPUT_DIR / f"{content_path.stem}__{template_path.stem}.html"
 
