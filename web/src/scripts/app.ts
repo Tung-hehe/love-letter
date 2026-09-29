@@ -5,6 +5,7 @@
 import { TEMPLATE_LIST, getTemplateMeta } from '../data/templates';
 import { renderLetter, buildPages } from '../lib/render';
 import { encodeSharedLetter, decodeSharedLetter, sharedLetterUrl } from '../lib/shareLink';
+import { buildShareQrSvg } from '../lib/qr';
 import type { Letter, LetterContext, LetterPage } from '../lib/types';
 
 const LETTERS_KEY = 'thu-tay-letters-v1';
@@ -793,57 +794,82 @@ function currentLetterPayload() {
   return { templateId, letter: { title, date, greeting, label, content, closing, sign, postscript } };
 }
 
-// Khi cả Web Share lẫn Clipboard API đều không dùng được (VD trình duyệt trong
-// app Zalo/Messenger hay chặn 1 trong 2 API này) — hiện link trong 1 ô sẵn tự
-// bôi đen để người dùng tự bấm sao chép, thay vì window.prompt() (nhiều trình
-// duyệt nhúng trong app chat không hỗ trợ hộp thoại prompt).
-function showLinkFallback(url: string) {
+// Hiện link + mã QR trong 1 hộp thoại nhỏ — luôn hiện cả hai cùng lúc (không chỉ
+// khi sao chép lỗi) vì mã QR là 1 cách gửi khác hẳn: soạn trên máy tính rồi đưa
+// điện thoại người kia quét ngay tại chỗ, hoặc in ra thiệp giấy kèm mã, không cần
+// gửi link qua ứng dụng nào cả. Tự dựng bằng DOM thay vì component .astro vì đây
+// là hộp thoại dùng chung cho cả 2 màn (Soạn thư/Xem thư) và chỉ xuất hiện khi
+// người dùng chủ động bấm nút.
+function showShareLinkModal(url: string) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;';
+
   const box = document.createElement('div');
-  box.style.cssText = 'background:var(--paper);border-radius:14px;padding:20px;max-width:360px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);';
-  const label = document.createElement('p');
-  label.textContent = 'Sao chép link bên dưới để gửi:';
-  label.style.cssText = 'margin:0 0 10px;font-size:13.5px;color:var(--ink);';
+  box.style.cssText = 'background:var(--paper);border-radius:16px;padding:22px;max-width:300px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:stretch;gap:12px;';
+
+  const title = document.createElement('p');
+  title.textContent = 'Link chia sẻ thư';
+  title.style.cssText = 'margin:0;font-size:14.5px;font-weight:600;color:var(--ink);';
+
+  const qrWrap = document.createElement('div');
+  qrWrap.style.cssText = 'background:#fff;padding:10px;border-radius:12px;line-height:0;align-self:center;';
+  qrWrap.innerHTML = buildShareQrSvg(url, 176);
+
+  const hint = document.createElement('p');
+  hint.textContent = 'Quét mã để mở thư ngay trên điện thoại';
+  hint.style.cssText = 'margin:0;font-size:12px;color:var(--ink-soft);text-align:center;';
+
   const input = document.createElement('input');
   input.type = 'text';
   input.readOnly = true;
   input.value = url;
-  input.style.cssText = 'width:100%;box-sizing:border-box;padding:9px 10px;border-radius:8px;border:1px solid var(--border-strong);font-size:13px;margin-bottom:10px;background:var(--paper-raised);color:var(--ink);';
+  input.style.cssText = 'width:100%;box-sizing:border-box;padding:9px 10px;border-radius:8px;border:1px solid var(--border-strong);font-size:12.5px;background:var(--paper-raised);color:var(--ink);';
+  input.addEventListener('click', () => input.select());
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.textContent = 'Sao chép link';
+  copyBtn.style.cssText = 'width:100%;padding:10px;border-radius:9px;border:none;background:var(--accent-fill);color:#fff;font-weight:600;font-family:inherit;font-size:13.5px;';
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      copyBtn.textContent = 'Đã sao chép!';
+      setTimeout(() => { copyBtn.textContent = 'Sao chép link'; }, 1600);
+    } catch (e) {
+      input.focus();
+      input.select(); // clipboard bị chặn thì ít nhất bôi đen sẵn để người dùng tự bấm Ctrl/Cmd+C
+    }
+  });
+
+  box.append(title, qrWrap, hint, input, copyBtn);
+
+  if (navigator.share) {
+    const shareBtn = document.createElement('button');
+    shareBtn.type = 'button';
+    shareBtn.textContent = 'Chia sẻ qua ứng dụng khác…';
+    shareBtn.style.cssText = 'width:100%;padding:10px;border-radius:9px;border:1px solid var(--border-strong);background:transparent;color:var(--ink);font-weight:500;font-family:inherit;font-size:13.5px;';
+    shareBtn.addEventListener('click', async () => {
+      try { await navigator.share({ url, title: currentLetter!.title || 'Bức thư' }); } catch (e) { /* người dùng tự huỷ hoặc lỗi, bỏ qua */ }
+    });
+    box.appendChild(shareBtn);
+  }
+
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
   closeBtn.textContent = 'Đóng';
-  closeBtn.style.cssText = 'width:100%;padding:9px;border-radius:8px;border:none;background:var(--accent-fill);color:#fff;font-weight:600;font-family:inherit;';
+  closeBtn.style.cssText = 'width:100%;padding:8px;border-radius:9px;border:none;background:transparent;color:var(--ink-soft);font-family:inherit;font-size:13px;';
   closeBtn.addEventListener('click', () => overlay.remove());
+  box.appendChild(closeBtn);
+
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-  box.append(label, input, closeBtn);
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  input.focus();
-  input.select();
-}
-
-async function copyOrShareLink(url: string) {
-  if (navigator.share) {
-    try {
-      await navigator.share({ url, title: currentLetter!.title || 'Bức thư' });
-      return;
-    } catch (e) {
-      if (e instanceof Error && e.name === 'AbortError') return; // người dùng tự huỷ hộp thoại chia sẻ
-    }
-  }
-  try {
-    await navigator.clipboard.writeText(url);
-    window.alert('Đã sao chép link chia sẻ! Dán vào Messenger/Zalo để gửi.');
-  } catch (e) {
-    showLinkFallback(url);
-  }
 }
 
 async function shareLetterLink() {
   try {
     const url = sharedLetterUrl(await encodeSharedLetter(currentLetterPayload()));
-    await copyOrShareLink(url);
+    showShareLinkModal(url);
   } catch (e) {
     window.alert('Không tạo được link chia sẻ: ' + errMsg(e));
   }
