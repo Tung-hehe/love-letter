@@ -6,7 +6,7 @@ Cách dùng cơ bản:
     python generate.py
 
 Cách dùng có tuỳ chọn:
-    python generate.py --content content/thu_mau.yaml --template templates/template_am_ap.html --output output/thu_gui_an.html
+    python generate.py --content content/thu_mau.yaml --template templates/template_warm.html --output output/thu_gui_an.html
 
 Xem tất cả tuỳ chọn:
     python generate.py --help
