@@ -45,7 +45,7 @@ love-letter-project/
 ```bash
 cd web
 npm install
-npm run dev        # http://localhost:4321, có hot-reload
+npm run dev        # http://localhost:4321
 ```
 
 ## Build
