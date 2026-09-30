@@ -794,6 +794,36 @@ function currentLetterPayload() {
   return { templateId, letter: { title, date, greeting, label, content, closing, sign, postscript } };
 }
 
+// Lưu mã QR thành file .png — dựng ở độ phân giải cao hơn hẳn bản hiện trên màn
+// hình (176px) để in ra thiệp giấy vẫn nét, không chỉ đủ xem trên máy. Convert
+// qua canvas vì SVG không phải định dạng ảnh mà hầu hết chỗ (Zalo, máy in ảnh...)
+// nhận "lưu ảnh" trực tiếp được.
+async function downloadQrPng(url: string): Promise<void> {
+  const size = 640;
+  const svg = buildShareQrSvg(url, size);
+  const svgBlobUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('Không dựng được ảnh QR'));
+      image.src = svgBlobUrl;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    canvas.getContext('2d')!.drawImage(img, 0, 0, size, size);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `${slugify(currentLetter?.title)}__qr.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } finally {
+    URL.revokeObjectURL(svgBlobUrl);
+  }
+}
+
 // Hiện link + mã QR trong 1 hộp thoại nhỏ — luôn hiện cả hai cùng lúc (không chỉ
 // khi sao chép lỗi) vì mã QR là 1 cách gửi khác hẳn: soạn trên máy tính rồi đưa
 // điện thoại người kia quét ngay tại chỗ, hoặc in ra thiệp giấy kèm mã, không cần
@@ -819,6 +849,18 @@ function showShareLinkModal(url: string) {
   hint.textContent = 'Quét mã để mở thư ngay trên điện thoại';
   hint.style.cssText = 'margin:0;font-size:12px;color:var(--ink-soft);text-align:center;';
 
+  const saveQrBtn = document.createElement('button');
+  saveQrBtn.type = 'button';
+  saveQrBtn.textContent = 'Lưu mã QR (.png)';
+  saveQrBtn.style.cssText = 'width:100%;padding:10px;border-radius:9px;border:1px solid var(--border-strong);background:transparent;color:var(--ink);font-weight:500;font-family:inherit;font-size:13.5px;';
+  saveQrBtn.addEventListener('click', async () => {
+    try {
+      await downloadQrPng(url);
+    } catch (e) {
+      window.alert('Không lưu được ảnh QR: ' + errMsg(e));
+    }
+  });
+
   const input = document.createElement('input');
   input.type = 'text';
   input.readOnly = true;
@@ -841,7 +883,7 @@ function showShareLinkModal(url: string) {
     }
   });
 
-  box.append(title, qrWrap, hint, input, copyBtn);
+  box.append(title, qrWrap, hint, saveQrBtn, input, copyBtn);
 
   if (navigator.share) {
     const shareBtn = document.createElement('button');
