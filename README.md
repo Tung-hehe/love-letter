@@ -27,7 +27,9 @@ love-letter-project/
 │   ├── template_family_4.html    → Gia đình (4 người)
 │   ├── template_family_5.html    → Gia đình (5 người)
 │   ├── template_farewell.html    → Chia tay
-│   └── template_celebration.html → Chúc mừng
+│   ├── template_celebration.html → Chúc mừng
+│   ├── template_halloween.html   → Halloween
+│   └── template_birthday.html    → Sinh nhật
 ├── output/               # Thư đã render
 ├── generate.py           # Script xuất thư
 └── web/                  # App soạn thư (Astro + TypeScript), deploy qua Vercel

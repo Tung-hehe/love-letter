@@ -126,6 +126,18 @@ export const TEMPLATE_LIST: TemplateMeta[] = [
     icon: '<path d="M12 3l1.3 6.7L20 11l-6.7 1.3L12 19l-1.3-6.7L4 11l6.7-1.3z"/>',
     sample: { title: 'Chúc mừng cậu nhé', greeting: 'Gửi cậu,', closing: 'Chúc mừng cậu thật nhiều', sign: 'Người luôn ủng hộ cậu',
       content: [['Nghe tin vui của cậu mà mình mừng muốn nhảy cẫng lên luôn!', 'Xứng đáng lắm, chúc cậu sẽ còn tiến xa hơn nữa nhé.']] } },
+  { id: 'halloween', file: 'template_halloween.html', name: 'Halloween', mood: 'tinh nghịch',
+    gradient: 'linear-gradient(160deg,#140a24 0%,#2f1a4a 55%,#5b2a86 100%)', ink: '#5b2a86',
+    iconGradient: 'linear-gradient(135deg,#ff7f2a,#5b2a86)',
+    icon: '<path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z"/><circle cx="9.5" cy="10" r="0.8" fill="#fff"/><circle cx="14.5" cy="10" r="0.8" fill="#fff"/>',
+    sample: { title: 'Boo! Chúc Halloween vui vẻ', greeting: 'Gửi cậu,', closing: 'Chúc cậu một đêm Halloween ma mị mà vui vẻ', sign: 'Từ hội ma cà rồng của cậu',
+      content: [['Đêm nay bí ngô sáng đèn, kẹo đã sẵn sàng, chỉ chờ cậu xuất hiện thôi!', 'Diện đồ thật ngầu vào, tụi mình đi "trick or treat" một vòng nhé.']] } },
+  { id: 'sinh_nhat', file: 'template_birthday.html', name: 'Sinh nhật', mood: 'tưng bừng',
+    gradient: 'linear-gradient(150deg,#fadbfa 0%,#fff3b0 45%,#ffd6e8 100%)', ink: '#853285',
+    iconGradient: 'linear-gradient(135deg,#ffb703,#853285)',
+    icon: '<path d="M4 20h16v-7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v7z"/><path d="M4 15c1.5 0 1.5-1.5 3-1.5s1.5 1.5 3 1.5 1.5-1.5 3-1.5 1.5 1.5 3 1.5 1.5-1.5 3-1.5"/><path d="M12 12V7"/><path d="M12 7c-1.1 0-1.6-.9-1-1.8.3-.5.7-.9 1-1.4.3.5.7.9 1 1.4.6.9.1 1.8-1 1.8z"/>',
+    sample: { title: 'Chúc mừng sinh nhật cậu', greeting: 'Gửi cậu,', closing: 'Chúc cậu tuổi mới thật nhiều niềm vui', sign: 'Người luôn nhớ ngày này',
+      content: [['Vậy là cậu đã lớn thêm một tuổi rồi đấy — chúc mừng sinh nhật cậu nhé!', 'Mong năm nay của cậu rực rỡ như những ngọn nến trên bánh kem, và mọi điều ước đều thành hiện thực.']] } },
 ];
 
 // Tra cứu theo id, có fallback về phong cách đầu tiên khi id không còn tồn tại

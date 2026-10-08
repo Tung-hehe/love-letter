@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<title>{{ title or "Thư Halloween"}}</title>
+<style>
+  :root{
+    --cheer: #ff7f2a;
+    --cheer-deep: #5b2a86;
+    --sticky: #fdf6e8;
+    --page: #2a1b3d;
+    --ink: #2e2140;
+    --ink-soft: #8a76a8;
+    --glow: #9be15d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;touch-action:manipulation;}
+  body{
+    position:relative;
+    background: linear-gradient(160deg, #140a24 0%, #2f1a4a 55%, #5b2a86 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    text-rendering:optimizeLegibility;
+  }
+  .note{
+    position:relative;
+    width:100%;
+    max-width:600px;
+    /* Lấm tấm sao nhỏ mờ trên nền giấy — kết cấu tinh tế cho phần nội dung thư
+       đỡ trống trải, thay vì phải thêm hẳn 1 hình minh hoạ mới. */
+    background:
+      radial-gradient(circle at 12% 20%, rgba(91,42,134,0.09) 1.4px, transparent 1.6px),
+      radial-gradient(circle at 80% 14%, rgba(91,42,134,0.08) 1.2px, transparent 1.4px),
+      radial-gradient(circle at 32% 46%, rgba(91,42,134,0.07) 1.3px, transparent 1.5px),
+      radial-gradient(circle at 90% 42%, rgba(91,42,134,0.07) 1.1px, transparent 1.3px),
+      radial-gradient(circle at 62% 28%, rgba(91,42,134,0.06) 1px, transparent 1.2px),
+      radial-gradient(circle at 18% 72%, rgba(91,42,134,0.08) 1.3px, transparent 1.5px),
+      radial-gradient(circle at 70% 78%, rgba(91,42,134,0.07) 1.2px, transparent 1.4px),
+      radial-gradient(circle at 45% 90%, rgba(91,42,134,0.06) 1px, transparent 1.2px),
+      var(--sticky);
+    border-radius:2px 22px 2px 22px;
+    box-shadow: 0 18px 40px rgba(20,10,36,0.5);
+    padding:44px 44px 42px;
+    overflow:hidden;
+    z-index:1;
+  }
+  .note::after{
+    content:"";
+    position:absolute;
+    bottom:0; right:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:0 0 28px 28px;
+    border-color: transparent transparent var(--page) transparent;
+    filter: drop-shadow(-2px -2px 3px rgba(46,33,64,0.3));
+  }
+  /* 2 tia sáng nhỏ ở góc trên của thư — điểm nhấn tối giản cho phần nội dung đỡ
+     trống trải, không phải 1 hình minh hoạ mới cần vẽ tay phức tạp. */
+  .corner-sparkle{
+    position:absolute;
+    z-index:0;
+    width:20px;
+    height:20px;
+    animation: twinkle 3s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .corner-sparkle-tl{ top:14px; left:18px; }
+  .corner-sparkle-tr{ top:20px; right:22px; animation-delay:1.2s; }
+  /* Bầu trời đêm chỉ còn sao lấp lánh (xem .float bên dưới) + hồn ma/phù thủy
+     bay ngang qua thư — bỏ hẳn các hình minh hoạ tĩnh ở góc thư (mạng nhện, bí
+     ngô…) đã thử qua nhiều lần vẫn không đẹp, thiết kế lại theo hướng tối giản
+     hơn: chỉ còn chuyển động, không còn hình tĩnh nào trong thư. */
+  .spirit{
+    position:fixed;
+    z-index:0;
+    pointer-events:none;
+  }
+  .ghost-fly{
+    top:16%;
+    left:0;
+    width:72px;
+    height:72px;
+    opacity:0.8;
+    filter: drop-shadow(0 2px 6px rgba(20,10,36,0.5));
+    animation: fly-across 19s ease-in-out infinite alternate;
+  }
+  .ghost-fly2{
+    top:64%;
+    width:54px;
+    height:54px;
+    opacity:0.7;
+    animation-duration: 24s;
+    animation-delay: -8s;
+  }
+  @keyframes fly-across{
+    0%{ transform:translate(-20vw, 0) rotate(-4deg); }
+    25%{ transform:translate(10vw, -16px) rotate(2deg); }
+    50%{ transform:translate(45vw, 8px) rotate(-3deg); }
+    75%{ transform:translate(80vw, -14px) rotate(3deg); }
+    100%{ transform:translate(115vw, 0) rotate(-2deg); }
+  }
+  /* Phù thủy có hướng mặt rõ ràng (đầu chổi hướng về phía bay tới) nên không
+     thể dùng animation-direction:alternate như ma — nếu chỉ chạy ngược lại,
+     hình sẽ giữ nguyên hướng cũ và trông như bay lùi. Gộp cả lượt đi lẫn lượt
+     về vào 1 keyframe duy nhất, lật scaleX ngay tại 2 đầu (khi đã ra ngoài màn
+     hình) để mắt thường không thấy chỗ lật, luôn thấy phù thủy quay đúng đầu
+     theo hướng đang bay. */
+  .witch-fly{
+    top:38%;
+    left:0;
+    width:98px;
+    height:auto;
+    opacity:0.85;
+    filter: drop-shadow(0 2px 6px rgba(20,10,36,0.5));
+    animation: fly-across-flip 21s linear infinite;
+  }
+  @keyframes fly-across-flip{
+    0%{ transform:translate(-20vw, 0) rotate(-4deg) scaleX(1); }
+    22%{ transform:translate(40vw, -16px) rotate(2deg) scaleX(1); }
+    47%{ transform:translate(112vw, 4px) rotate(0deg) scaleX(1); }
+    50%{ transform:translate(118vw, 0) rotate(0deg) scaleX(-1); }
+    53%{ transform:translate(112vw, 4px) rotate(0deg) scaleX(-1); }
+    72%{ transform:translate(40vw, 14px) rotate(-2deg) scaleX(-1); }
+    97%{ transform:translate(-18vw, 0) rotate(0deg) scaleX(-1); }
+    100%{ transform:translate(-20vw, 0) rotate(0deg) scaleX(1); }
+  }
+  .eyebrow-wrap{ display:flex; justify-content:center; position:relative; z-index:1; margin-bottom:14px; }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 18px;
+    background: rgba(91,42,134,0.12);
+    border:1px solid rgba(91,42,134,0.35);
+    border-radius:999px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color: var(--cheer-deep);
+    animation: eyebrow-breathe 2.2s ease-in-out infinite;
+  }
+  @keyframes eyebrow-breathe{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.05); }
+  }
+  .status{
+    display:flex;
+    justify-content:center;
+    margin-bottom:5px;
+  }
+  .status span{
+    color: var(--ink-soft);
+    font-size:13px;
+    padding:4px 13px;
+    border-radius:999px;
+    letter-spacing:0.02em;
+  }
+  .greeting{
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(28px, 6.2vw, 38px);
+    color: var(--cheer-deep);
+    text-align:center;
+    margin: 0 0 20px;
+    line-height:1.3;
+  }
+  .divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:0 auto 22px;
+    color: var(--glow);
+  }
+  .divider .line{
+    width:36px; height:1.5px;
+    background: var(--glow);
+    border-radius:3px;
+    opacity:0.6;
+  }
+  .divider svg{ animation: sparkle-spin 2.4s ease-in-out infinite; }
+  .body-text{
+    border-left:2px solid rgba(91,42,134,0.3);
+    padding-left:18px;
+    margin:0 6px;
+  }
+  .body-text p{
+    font-size:clamp(15.5px, 2.1vw, 17px);
+    font-weight:400;
+    line-height:1.9;
+    margin:0 0 18px;
+    color: var(--ink);
+    text-align:justify;
+    text-align-last:left;
+  }
+  .body-text a, .ps a{ color:var(--cheer-deep); text-decoration:underline; text-underline-offset:2px; }
+  .body-text p:last-child{ margin-bottom:0; }
+  .closing{
+    text-align:center;
+    margin-top:28px;
+  }
+  .closing-text{
+    font-size:14.5px;
+    color: var(--ink);
+    margin-bottom:6px;
+  }
+  .signature{
+    font-family:'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:25px;
+    color: var(--cheer-deep);
+    line-height:1.3;
+  }
+  .mark{
+    margin-top:10px;
+    color: var(--glow);
+    display:inline-flex;
+    animation: sparkle-spin 2.6s ease-in-out infinite;
+  }
+  @keyframes sparkle-spin{
+    0%,100%{ transform:scale(1) rotate(0deg); color:var(--glow); }
+    50%{ transform:scale(1.2) rotate(-8deg); color:var(--cheer-deep); }
+  }
+  .ps{
+    margin-top:24px;
+    text-align:center;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight:400;
+    font-style:italic;
+    font-size:15px;
+    color: var(--ink);
+  }
+  .float.f1{ top:12%; left:8%; font-size:24px; }
+  .float.f2{ top:20%; right:9%; font-size:22px; animation-delay:1s; }
+  .float.f3{ bottom:16%; left:10%; font-size:21px; animation-delay:2s; }
+  .float.f4{ bottom:22%; right:7%; font-size:23px; animation-delay:0.5s; }
+  .float.f5{ top:7%; left:38%; font-size:18px; animation-delay:1.6s; }
+  .float.f6{ top:9%; right:36%; font-size:20px; animation-delay:2.4s; }
+  .float.f7{ bottom:7%; left:41%; font-size:19px; animation-delay:0.8s; }
+  .float.f8{ bottom:10%; right:39%; font-size:18px; animation-delay:3s; }
+  .float{
+    position:fixed;
+    opacity:0.92;
+    animation: bob 4s ease-in-out infinite;
+    z-index:0;
+    filter: drop-shadow(0 3px 10px rgba(20,10,36,0.5));
+  }
+  .float.f2, .float.f4, .float.f6, .float.f8{
+    filter: drop-shadow(0 0 10px rgba(255,127,42,0.8));
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0) rotate(0deg); }
+    50%{ transform:translateY(-16px) rotate(-10deg); }
+  }
+  /* Sao lấp lánh xen giữa bí ngô — nhấp nháy tại chỗ thay vì bồng bềnh lên
+     xuống, đúng kiểu sao trên trời đêm. */
+  .float.star{
+    color:#fdf6e8;
+    animation: twinkle 3.6s ease-in-out infinite;
+    filter: drop-shadow(0 0 6px rgba(253,246,232,0.55));
+  }
+  .float.star.f2, .float.star.f4, .float.star.f6, .float.star.f8{
+    color: var(--glow);
+    filter: drop-shadow(0 0 8px rgba(155,225,93,0.6));
+  }
+  @keyframes twinkle{
+    0%,100%{ transform:scale(0.75); opacity:0.35; }
+    50%{ transform:scale(1.15); opacity:1; }
+  }
+  .card-glow{
+    position:fixed;
+    width:420px; height:420px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,127,42,0.32), transparent 70%);
+    filter:blur(30px);
+    animation: glow-breathe 5.5s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:0.6; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.07); }
+  }
+  .pages{ position:relative; }
+  .page{ display:none; }
+  .page.active{ display:flex; flex-direction:column; justify-content:center; animation: page-fade 0.4s ease; }
+  @keyframes page-fade{
+    from{ opacity:0; transform:translateX(10px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .page-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    margin-top:26px;
+  }
+  .page-nav .page-btn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid rgba(91,42,134,0.35);
+    background: rgba(91,42,134,0.1);
+    color: var(--cheer-deep);
+    font-size:17px;
+    line-height:1;
+    padding:0;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .page-nav .page-btn:disabled{ opacity:0.28; cursor:default; }
+  .page-nav .page-btn:not(:disabled):active{ transform:scale(0.9); }
+  .page-dots{ display:flex; align-items:center; gap:7px; }
+  .page-dots .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background: rgba(91,42,134,0.3);
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .page-dots .dot.active{ background: var(--cheer-deep); transform:scale(1.35); }
+  .fx-mote{
+    position:absolute;
+    border-radius:50%;
+    background: radial-gradient(circle, var(--mote-color, rgba(155,225,93,0.85)), transparent 72%);
+    filter: blur(0.5px);
+    animation: mote-bounce 6s ease-in-out infinite;
+    z-index:-1;
+    pointer-events:none;
+  }
+  @keyframes mote-bounce{
+    0%{ transform:translateY(0) translateX(0) scale(0.5); opacity:0; }
+    10%{ opacity:0.5; }
+    30%{ transform:translateY(-24px) translateX(-9px) scale(0.75); }
+    50%{ transform:translateY(-48px) translateX(9px) scale(0.85); opacity:0.55; }
+    70%{ transform:translateY(-70px) translateX(-6px) scale(0.7); }
+    88%{ opacity:0.1; }
+    100%{ transform:translateY(-98px) translateX(6px) scale(0.5); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .float, .page, .fx-mote, .card-glow, .envelope-body, .seal, .mark, .eyebrow, .spirit, .corner-sparkle, .divider svg{ animation:none; }
+  }
+  @media (max-width:480px){
+    .note{ padding:36px 24px 36px; }
+    .ghost-fly{ width:44px; height:44px; }
+    .ghost-fly2{ width:34px; height:34px; }
+    .witch-fly{ width:60px; }
+    .float{ opacity:0.75; }
+    .float.f1{ top:6%; left:2%; font-size:16px; }
+    .float.f2{ top:15%; right:2%; font-size:15px; }
+    .float.f3{ bottom:10%; left:2%; font-size:13px; }
+    .float.f4{ bottom:17%; right:2%; font-size:16px; }
+    .float.f5{ top:3%; left:32%; font-size:12px; }
+    .float.f6{ top:11%; right:29%; font-size:14px; }
+    .float.f7{ bottom:3%; left:35%; font-size:13px; }
+    .float.f8{ bottom:13%; right:33%; font-size:12px; }
+  }
+
+  /* --- Hiệu ứng mở thư --- */
+  .envelope-scene{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+    transition:opacity 0.5s ease;
+  }
+  .envelope-scene.scene-hide{
+    opacity:0;
+    pointer-events:none;
+  }
+  .envelope{
+    position:relative;
+    width:min(320px, 86vw);
+    height:min(219px, 59vw);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    outline:none;
+    perspective:700px;
+  }
+  .envelope:focus-visible .envelope-body{
+    box-shadow:0 0 0 3px rgba(155,225,93,0.6), 0 20px 45px rgba(0,0,0,0.4);
+  }
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background:#ff7f2a;
+    border-radius:10px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.4);
+    overflow:hidden;
+    animation: cheer-shake 3.6s ease-in-out infinite;
+  }
+  @keyframes cheer-shake{
+    0%,84%,100%{ transform:rotate(0deg) scale(1); }
+    88%{ transform:rotate(-2deg) scale(1.01); }
+    92%{ transform:rotate(2deg) scale(1.01); }
+    96%{ transform:rotate(-1deg) scale(1); }
+  }
+  .envelope.opening .envelope-body{ animation:none; }
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:60%;
+    background:#5b2a86;
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    transition:transform 0.7s cubic-bezier(.6,-0.28,.74,.05);
+    z-index:2;
+  }
+  .envelope.opening .envelope-flap{
+    transform:rotateX(-165deg);
+  }
+  .seal{
+    position:absolute;
+    top:38%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:54px; height:54px;
+    border-radius:50%;
+    background:#fdf6e8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#5b2a86;
+    font-size:18px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.35);
+    z-index:3;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+  }
+  .envelope.opening .seal{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.5);
+  }
+  .envelope-hint{
+    position:absolute;
+    bottom:-32px;
+    left:0; right:0;
+    text-align:center;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:13px;
+    color:#f3d9c2;
+    animation:hint-bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes hint-bounce{
+    0%,100%{ transform:translateY(0); opacity:0.85; }
+    50%{ transform:translateY(4px); opacity:1; }
+  }
+  .envelope.opening .envelope-hint{ opacity:0; }
+  #letter-card{
+    opacity:0;
+    transform:translateY(24px) scale(0.96);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  #letter-card.card-visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .envelope-flap{ transition:transform 0.01s linear; }
+    .envelope-hint{ animation:none; }
+    #letter-card{ transition:opacity 0.2s linear; transform:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="envelope-scene" id="envelope-scene">
+    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Nhấn để mở thư">
+      <div class="envelope-body">
+        <div class="envelope-flap"></div>
+        <div class="seal">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z"/>
+            <circle cx="9.5" cy="10" r="0.8" fill="currentColor" stroke="none"/>
+            <circle cx="14.5" cy="10" r="0.8" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <div class="envelope-hint">Chạm để mở thư</div>
+    </div>
+  </div>
+  <div class="card-glow"></div>
+  <span class="float f1">🎃</span>
+  <span class="float star f2">✦</span>
+  <span class="float f3">🎃</span>
+  <span class="float star f4">✧</span>
+  <span class="float f5">🎃</span>
+  <span class="float star f6">✦</span>
+  <span class="float f7">🎃</span>
+  <span class="float star f8">✧</span>
+  <svg class="spirit ghost-fly" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z" fill="#fdf6e8"/>
+  </svg>
+  <svg class="spirit ghost-fly ghost-fly2" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z" fill="#fdf6e8"/>
+  </svg>
+  <svg class="spirit witch-fly" viewBox="-12 -10 65 45" aria-hidden="true">
+    <g fill="var(--cheer-deep)">
+      <rect x="5" y="28" width="45" height="3" rx="1.5"/>
+      <path d="M5,28 L-9,19 L-6,29.5 L-9,40 L5,31 Z"/>
+      <path d="M25,10 L41,31 L14,31 Z"/>
+      <circle cx="27" cy="8" r="5.5"/>
+      <path d="M21.5,4 L27,-7 L33.5,4 Z"/>
+      <ellipse cx="27" cy="4" rx="7.5" ry="2"/>
+    </g>
+  </svg>
+  <div class="note" id="letter-card">
+    <span class="fx-mote" style="width:4px; height:4px; left:8%; bottom:10%; animation-delay:0s; --mote-color: rgba(155,225,93,0.8);"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:18%; bottom:52%; animation-delay:0.7s; --mote-color: rgba(255,127,42,0.75);"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:30%; bottom:26%; animation-delay:1.4s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:42%; bottom:66%; animation-delay:2.1s; --mote-color: rgba(155,225,93,0.8);"></span>
+    <span class="fx-mote" style="width:4px; height:4px; left:54%; bottom:14%; animation-delay:2.8s; --mote-color: rgba(255,127,42,0.75);"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:64%; bottom:44%; animation-delay:3.5s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:74%; bottom:70%; animation-delay:4.2s; --mote-color: rgba(155,225,93,0.8);"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:84%; bottom:24%; animation-delay:4.9s; --mote-color: rgba(255,127,42,0.75);"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:92%; bottom:56%; animation-delay:5.6s;"></span>
+    <span class="fx-mote" style="width:3px; height:3px; left:12%; bottom:76%; animation-delay:6.1s; --mote-color: rgba(155,225,93,0.8);"></span>
+    <svg class="corner-sparkle corner-sparkle-tl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.3 6.7L20 11l-6.7 1.3L12 19l-1.3-6.7L4 11l6.7-1.3z" fill="var(--glow)"/></svg>
+    <svg class="corner-sparkle corner-sparkle-tr" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.3 6.7L20 11l-6.7 1.3L12 19l-1.3-6.7L4 11l6.7-1.3z" fill="var(--cheer)"/></svg>
+    <div class="eyebrow-wrap"><div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-3px;flex-shrink:0;"><path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z"/><circle cx="9.5" cy="10" r="0.8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="10" r="0.8" fill="currentColor" stroke="none"/></svg>{{ label or "Halloween" }}</div></div>
+    <div class="status"><span>{{ date }}</span></div>
+    <div class="greeting">{{ greeting }}</div>
+    <div class="divider"><span class="line"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z"/><circle cx="9.5" cy="10" r="0.8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="10" r="0.8" fill="currentColor" stroke="none"/></svg><span class="line"></span></div>
+    {% set pages = content %}
+    <div class="pages" id="letter-pages">
+      {% for page in pages %}
+      <div class="page{% if loop.first %} active{% endif %}">
+        <div class="body-text">
+          {% for doan in page %}
+          <p>{{ doan }}</p>
+          {% endfor %}
+        </div>
+        {% if loop.last %}
+        <div class="closing">
+          <div class="closing-text">{{ closing }}</div>
+          <div class="signature">{{ sign }}</div>
+          <div class="mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20V10a6 6 0 0 1 12 0v10l-2.5-2-2 2-2-2-2 2-2-2z"/><circle cx="9.5" cy="10" r="0.7" fill="currentColor" stroke="none"/><circle cx="14.5" cy="10" r="0.7" fill="currentColor" stroke="none"/></svg>
+          </div>
+        </div>
+        {% if postscript %}
+        <div class="ps">{{ postscript }}</div>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if pages|length > 1 %}
+    <div class="page-nav">
+      <button type="button" class="page-btn page-prev" aria-label="Trang trước" disabled>‹</button>
+      <div class="page-dots">
+        {% for page in pages %}
+        <span class="dot{% if loop.first %} active{% endif %}"></span>
+        {% endfor %}
+      </div>
+      <button type="button" class="page-btn page-next" aria-label="Trang sau">›</button>
+    </div>
+    {% endif %}
+  </div>
+
+<script>
+(function(){
+  var envelope = document.getElementById('envelope');
+  var scene = document.getElementById('envelope-scene');
+  var card = document.getElementById('letter-card');
+  if(!envelope || !scene || !card) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var opened = false;
+
+  function openLetter(){
+    if(opened) return;
+    opened = true;
+    envelope.classList.add('opening');
+    var delay = reduced ? 30 : 650;
+    setTimeout(function(){
+      scene.classList.add('scene-hide');
+      card.classList.add('card-visible');
+    }, delay);
+    setTimeout(function(){
+      scene.style.display = 'none';
+    }, delay + (reduced ? 30 : 500));
+  }
+
+  envelope.addEventListener('click', openLetter);
+  envelope.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+      e.preventDefault();
+      openLetter();
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var wrap = document.getElementById('letter-pages');
+  if(!wrap) return;
+
+  (function balanceLastPage(){
+    var pgs = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+    if(pgs.length < 2) return;
+    var lastIdx = pgs.length - 1;
+    var closing = pgs[lastIdx].querySelector('.closing');
+    if(!closing) return;
+
+    pgs.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+    var heights = pgs.map(function(p){ return p.offsetHeight; });
+    pgs.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+
+    var refHeight = Math.max.apply(null, heights.slice(0, lastIdx));
+    var lastHeight = heights[lastIdx];
+    if(lastHeight <= refHeight + 40) return;
+
+    var ps = pgs[lastIdx].querySelector('.ps');
+    var newPage = document.createElement('div');
+    newPage.className = 'page';
+    newPage.appendChild(closing);
+    if(ps) newPage.appendChild(ps);
+    wrap.appendChild(newPage);
+
+    var dotsWrap = document.querySelector('.page-dots');
+    if(dotsWrap){
+      var dot = document.createElement('span');
+      dot.className = 'dot';
+      dotsWrap.appendChild(dot);
+    }
+  })();
+
+  var pages = Array.prototype.slice.call(wrap.querySelectorAll('.page'));
+  if(pages.length <= 1) return;
+
+  pages.forEach(function(p){ p.style.display = 'flex'; p.style.flexDirection = 'column'; });
+  var maxHeight = Math.max.apply(null, pages.map(function(p){ return p.offsetHeight; }));
+  pages.forEach(function(p){ p.style.display = ''; p.style.flexDirection = ''; });
+  wrap.style.minHeight = maxHeight + 'px';
+
+  var nav = document.querySelector('.page-nav');
+  var dots = nav ? Array.prototype.slice.call(nav.querySelectorAll('.dot')) : [];
+  var prevBtn = nav ? nav.querySelector('.page-prev') : null;
+  var nextBtn = nav ? nav.querySelector('.page-next') : null;
+  var current = 0;
+
+  function show(idx){
+    idx = Math.max(0, Math.min(pages.length - 1, idx));
+    if(idx === current) return;
+    pages[current].classList.remove('active');
+    pages[idx].classList.add('active');
+    if(dots[current]) dots[current].classList.remove('active');
+    if(dots[idx]) dots[idx].classList.add('active');
+    current = idx;
+    if(prevBtn) prevBtn.disabled = current === 0;
+    if(nextBtn) nextBtn.disabled = current === pages.length - 1;
+    var rect = wrap.getBoundingClientRect();
+    if(rect.top < -10){ wrap.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+
+  if(prevBtn) prevBtn.addEventListener('click', function(){ show(current - 1); });
+  if(nextBtn) nextBtn.addEventListener('click', function(){ show(current + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight') show(current + 1);
+    else if(e.key === 'ArrowLeft') show(current - 1);
+  });
+})();
+</script>
+</body>
+</html>
