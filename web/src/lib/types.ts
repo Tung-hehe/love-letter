@@ -36,7 +36,6 @@ export interface TemplateMeta {
   mood: string;
   gradient: string;
   ink: string;
-  iconGradient: string;
   icon: string;
   sample?: TemplateSample;
 }

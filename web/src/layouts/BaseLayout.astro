@@ -20,7 +20,7 @@ const { title = 'Thư Tay' } = Astro.props;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
-<meta name="theme-color" content="#B07680" />
+<meta name="theme-color" content="#1A2130" />
 <meta name="color-scheme" content="light dark" />
 <title>{title}</title>
 <link rel="manifest" href="/manifest.json" />
@@ -32,51 +32,53 @@ const { title = 'Thư Tay' } = Astro.props;
      query prefers-color-scheme không gộp được với attribute selector trong cùng
      1 rule nếu không dùng light-dark(), rủi ro tương thích hơn nên giữ tách). */
   :root, :root[data-theme="light"]{
-    --paper: #FDFBF8;
+    --paper: #F4F7FD;
     --paper-raised: #FFFFFF;
-    --ink: #4A3F3D;
-    --ink-soft: #8B7D7A;
-    --ink-faint: #BFB3AF;
-    --accent: #C08A93;
-    --accent-fill: #B07680;
-    --accent-soft: #EDD2D6;
-    --accent-bg: #FAF0F1;
-    --gold: #C9A876;
-    --gold-bg: #F7EFDF;
-    --preview-bg: #F6F0EB;
-    --border: rgba(74,63,61,0.10);
-    --border-strong: rgba(74,63,61,0.18);
-    --shadow: rgba(74,63,61,0.10);
+    --ink: #1A2130;
+    --ink-soft: #5B6679;
+    --ink-faint: #9AA6BC;
+    --accent: #7AA2F7;
+    --accent-fill: #3E6FD9;
+    --on-accent: #FFFFFF;
+    --accent-soft: #D6E2FC;
+    --accent-bg: #EAF0FD;
+    --gold: #F0A92E;
+    --gold-bg: #FDF3DD;
+    --preview-bg: #E9EEF8;
+    --border: rgba(26,33,48,0.10);
+    --border-strong: rgba(26,33,48,0.18);
+    --shadow: rgba(26,33,48,0.10);
     --danger: #C06B5E;
     --danger-bg: #FAEAE6;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --paper: #221D1F;
-      --paper-raised: #2C2628;
-      --ink: #F3ECE9;
-      --ink-soft: #CDBEBB;
-      --ink-faint: #8F817E;
-      --accent: #E3B0B8;
-      --accent-fill: #CC8C96;
-      --accent-soft: #6B4C51;
-      --accent-bg: rgba(227,176,184,0.13);
-      --gold: #DEC08A;
-      --gold-bg: rgba(222,192,138,0.13);
-      --preview-bg: #262023;
-      --border: rgba(243,236,233,0.11);
-      --border-strong: rgba(243,236,233,0.20);
+      --paper: #1A2130;
+      --paper-raised: #262C3B;
+      --ink: #F1F5F9;
+      --ink-soft: #94A3B8;
+      --ink-faint: #64748B;
+      --accent: #7AA2F7;
+      --accent-fill: #7AA2F7;
+      --on-accent: #1A2130;
+      --accent-soft: #2F3D63;
+      --accent-bg: rgba(122,162,247,0.12);
+      --gold: #F5C25A;
+      --gold-bg: rgba(245,194,90,0.13);
+      --preview-bg: #1F2737;
+      --border: rgba(148,163,184,0.16);
+      --border-strong: rgba(148,163,184,0.28);
       --shadow: rgba(0,0,0,0.45);
       --danger: #DE9186;
       --danger-bg: rgba(222,145,134,0.13);
     }
   }
   :root[data-theme="dark"]{
-    --paper: #221D1F; --paper-raised: #2C2628; --ink: #F3ECE9; --ink-soft: #CDBEBB;
-    --ink-faint: #8F817E; --accent: #E3B0B8; --accent-fill: #CC8C96; --accent-soft: #6B4C51;
-    --accent-bg: rgba(227,176,184,0.13); --gold: #DEC08A; --gold-bg: rgba(222,192,138,0.13);
-    --preview-bg: #262023;
-    --border: rgba(243,236,233,0.11); --border-strong: rgba(243,236,233,0.20); --shadow: rgba(0,0,0,0.45);
+    --paper: #1A2130; --paper-raised: #262C3B; --ink: #F1F5F9; --ink-soft: #94A3B8;
+    --ink-faint: #64748B; --accent: #7AA2F7; --accent-fill: #7AA2F7; --on-accent: #1A2130;
+    --accent-soft: #2F3D63; --accent-bg: rgba(122,162,247,0.12); --gold: #F5C25A; --gold-bg: rgba(245,194,90,0.13);
+    --preview-bg: #1F2737;
+    --border: rgba(148,163,184,0.16); --border-strong: rgba(148,163,184,0.28); --shadow: rgba(0,0,0,0.45);
     --danger: #DE9186; --danger-bg: rgba(222,145,134,0.13);
   }
   *{box-sizing:border-box;}
@@ -134,7 +136,7 @@ const { title = 'Thư Tay' } = Astro.props;
   .subtitle{font-size:14px;color:var(--ink-soft);margin:0 0 16px;line-height:1.55;}
 
   .primary-btn{
-    width:100%;background:var(--accent-fill);color:#fff;border:none;
+    width:100%;background:var(--accent-fill);color:var(--on-accent);border:none;
     border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit;
     box-shadow:0 10px 22px var(--shadow);
   }
@@ -150,7 +152,7 @@ const { title = 'Thư Tay' } = Astro.props;
      ComposeScreen.astro. Ẩn mặc định, chỉ hiện qua media query ở 2 file đó. */
   .topbar-primary-btn{
     display:none;flex-shrink:0;
-    background:var(--accent-fill);color:#fff;border:none;
+    background:var(--accent-fill);color:var(--on-accent);border:none;
     border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600;font-family:inherit;
     box-shadow:0 4px 10px var(--shadow);
   }

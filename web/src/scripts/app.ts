@@ -443,7 +443,7 @@ function renderHome() {
     card.className = 'letter-card';
     card.innerHTML = `
       <button type="button" class="letter-card-open">
-        <span class="lc-icon" style="background:${meta.iconGradient};">${templateIconSvg(meta.icon)}</span>
+        <span class="lc-icon" style="background:${meta.ink};">${templateIconSvg(meta.icon)}</span>
         <span class="lc-text">
           <p class="lc-title">${escapeHtml(letter.title || UNTITLED_LETTER)}</p>
           <p class="lc-meta">${escapeHtml(meta.name)} · ${formatRelativeTime(letter.updatedAt)}</p>
@@ -871,7 +871,7 @@ function showShareLinkModal(url: string) {
   const copyBtn = document.createElement('button');
   copyBtn.type = 'button';
   copyBtn.textContent = 'Sao chép link';
-  copyBtn.style.cssText = 'width:100%;padding:10px;border-radius:9px;border:none;background:var(--accent-fill);color:#fff;font-weight:600;font-family:inherit;font-size:13.5px;';
+  copyBtn.style.cssText = 'width:100%;padding:10px;border-radius:9px;border:none;background:var(--accent-fill);color:var(--on-accent);font-weight:600;font-family:inherit;font-size:13.5px;';
   copyBtn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(url);
